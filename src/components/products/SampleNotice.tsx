@@ -29,7 +29,7 @@ export function SampleNotice({ show, className }: { show: boolean; className?: s
       <Info aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-bronze" />
       <span>
         <strong className="font-medium text-white/80">Illustrative listings.</strong> These sample diamonds show how
-        natural diamonds will be presented. Grades are examples and images are representative of each shape — ask us
+        natural diamonds will be presented. Grades are examples and images are representative of each shape or colour — ask us
         for current availability and full details.
       </span>
     </p>

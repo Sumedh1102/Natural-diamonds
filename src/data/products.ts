@@ -5,7 +5,8 @@
  * presented, searched and filtered. They are NOT real inventory: the grades are
  * examples, images are representative shape photography, and no grading
  * reports or prices are attached. Every entry is flagged `isSample: true`,
- * which shows a "Sample listing" label across the site.
+ * which shows a "Sample listing" label across the site. Coloured samples use
+ * representative photographs of a stone in that colour.
  *
  * To go live, replace this array with the client's inventory (or load it from
  * an API/CMS in `src/lib/catalogue.ts`) and set `isSample: false` on real stones.
@@ -13,9 +14,10 @@
 import type { DiamondShape, Product, ProductImage } from "@/types";
 import { getShape } from "./shapes";
 
-function shapeGallery(shape: DiamondShape): ProductImage[] {
-  const { label, image } = getShape(shape);
-  const alt = `${label} cut diamond, representative image`;
+function shapeGallery(shape: DiamondShape, imageOverride?: { src: string; colour: string }): ProductImage[] {
+  const { label } = getShape(shape);
+  const image = imageOverride?.src ?? getShape(shape).image;
+  const alt = `${imageOverride ? `${imageOverride.colour} ` : ""}${label} cut diamond, representative image`;
   return [
     { src: image, alt: `${alt}, face-up view`, label: "Face-up", tone: "dark" },
     { src: image, alt: `${alt}, on an ivory background`, label: "On ivory", tone: "light" },
@@ -23,14 +25,20 @@ function shapeGallery(shape: DiamondShape): ProductImage[] {
   ];
 }
 
-type SampleInput = Omit<Product, "images" | "isSample" | "name"> & { name?: string };
+type SampleInput = Omit<Product, "images" | "isSample" | "name" | "category" | "colourOrigin"> &
+  Partial<Pick<Product, "name" | "category" | "colourOrigin">> & {
+    /** Representative photograph for coloured samples. */
+    image?: { src: string; colour: string };
+  };
 
-function sample(input: SampleInput): Product {
+function sample({ image, ...input }: SampleInput): Product {
   const { label } = getShape(input.shape);
   return {
+    category: "white",
+    colourOrigin: "natural",
     ...input,
     name: input.name ?? `${input.carat.toFixed(2)} ct ${label} Natural Diamond`,
-    images: shapeGallery(input.shape),
+    images: shapeGallery(input.shape, image),
     isSample: true,
   };
 }
@@ -205,5 +213,69 @@ export const products: Product[] = [
     fluorescence: "None",
     description: "A brilliant-cut heart with even lobes and a defined cleft, a meaningful choice for a gift.",
     collections: ["loose-natural-diamonds", "engagement-diamonds", "fancy-shapes"],
+  }),
+  sample({
+    slug: "cognac-round-0-52ct-nds-113",
+    reference: "NDS-113",
+    name: "0.52 ct Cognac Round Natural Diamond",
+    category: "champagne",
+    shape: "round",
+    carat: 0.52,
+    colorDescription: "Cognac (C6)",
+    clarity: "SI1",
+    polish: "Very Good",
+    symmetry: "Very Good",
+    fluorescence: "None",
+    description: "A warm cognac-toned round brilliant, its colour formed naturally — a rich alternative to a white diamond.",
+    collections: ["loose-natural-diamonds"],
+    image: { src: "/images/colours/brown.webp", colour: "Cognac" },
+  }),
+  sample({
+    slug: "fancy-yellow-round-0-90ct-nds-114",
+    reference: "NDS-114",
+    name: "0.90 ct Fancy Yellow Round Natural Diamond",
+    category: "fancy-colour",
+    shape: "round",
+    carat: 0.9,
+    colorDescription: "Fancy Yellow",
+    clarity: "VS2",
+    polish: "Excellent",
+    symmetry: "Very Good",
+    fluorescence: "Faint",
+    description: "A sunny natural fancy yellow, presented to show how coloured diamonds are described by hue and intensity.",
+    collections: ["loose-natural-diamonds"],
+    image: { src: "/images/colours/yellow.webp", colour: "Yellow" },
+  }),
+  sample({
+    slug: "fancy-light-pink-round-0-35ct-nds-115",
+    reference: "NDS-115",
+    name: "0.35 ct Fancy Light Pink Round Natural Diamond",
+    category: "fancy-colour",
+    shape: "round",
+    carat: 0.35,
+    colorDescription: "Fancy Light Pink",
+    clarity: "SI1",
+    polish: "Very Good",
+    symmetry: "Very Good",
+    fluorescence: "None",
+    description: "A delicate natural pink. Natural pink diamonds are among the rarest colours, so each is assessed individually.",
+    collections: ["loose-natural-diamonds"],
+    image: { src: "/images/colours/pink.webp", colour: "Pink" },
+  }),
+  sample({
+    slug: "treated-black-round-1-10ct-nds-116",
+    reference: "NDS-116",
+    name: "1.10 ct Black Round Natural Diamond (Treated Colour)",
+    category: "black",
+    colourOrigin: "treated",
+    treatmentNote: "Colour produced by treatment. The diamond itself is natural.",
+    shape: "round",
+    carat: 1.1,
+    colorDescription: "Black",
+    polish: "Very Good",
+    symmetry: "Good",
+    description: "An opaque, lustrous black round. Its colour is the result of treatment, which is disclosed here and on every listing of its kind.",
+    collections: ["loose-natural-diamonds"],
+    image: { src: "/images/colours/black.webp", colour: "Black" },
   }),
 ];

@@ -129,6 +129,9 @@ export function Header() {
     setMobileSection(null);
   };
 
+  // On the homepage the bar sits over the hero image until the page scrolls.
+  const overHero = pathname === "/" && !isScrolled && !mobileOpen;
+
   const toggleMobileMenu = () => {
     if (!mobileOpen) setMenuTop(headerRef.current?.getBoundingClientRect().bottom ?? 0);
     setMobileOpen((open) => !open);
@@ -139,7 +142,8 @@ export function Header() {
       <header
         ref={headerRef}
         className={cn(
-          "sticky top-0 z-40 bg-black transition-shadow duration-300",
+          "sticky top-0 z-40 transition-[background-color,box-shadow] duration-500",
+          overHero ? "bg-transparent" : "bg-black",
           isScrolled && "shadow-[0_18px_40px_-24px_rgba(0,0,0,0.9)]",
         )}
       >
@@ -333,7 +337,7 @@ export function Header() {
           aria-hidden="true"
           className={cn(
             "hairline-bronze absolute inset-x-0 bottom-0 h-px transition-opacity duration-300",
-            isScrolled ? "opacity-100" : "opacity-40",
+            isScrolled ? "opacity-100" : overHero ? "opacity-0" : "opacity-40",
           )}
         />
       </header>

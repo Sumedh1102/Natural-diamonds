@@ -42,7 +42,7 @@ export const collections: Collection[] = [
       alt: "A round brilliant diamond photographed face-up on black",
     },
     kind: "catalogue",
-    catalogueQuery: "?carat=1-1.49,1.5-1.99,2-",
+    catalogueQuery: "?category=white&carat=1-1.49,1.5-1.99,2-",
     inquiryInterest: "Engagement diamond",
     highlights: [
       { title: "One carat and above", text: "Centre stones sized for solitaire and halo settings." },

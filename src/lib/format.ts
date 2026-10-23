@@ -19,3 +19,12 @@ export function priceLabel(product: Product) {
 export function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
+
+/** Colour grade for white diamonds, otherwise the colour description. */
+export function colorLabel(product: Product) {
+  return product.color ?? product.colorDescription ?? "—";
+}
+
+export function clarityLabel(product: Product) {
+  return product.clarity ?? "Not graded";
+}

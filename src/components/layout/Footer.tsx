@@ -21,7 +21,7 @@ export function Footer() {
       <div aria-hidden="true" className="hairline-bronze absolute inset-x-0 top-0 h-px opacity-50" />
       <div className="mx-auto max-w-7xl px-4 pb-10 pt-16 sm:px-6 sm:pt-20 lg:px-12">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
-          <div className="sm:col-span-2 lg:col-span-4">
+          <div className="sm:col-span-2 lg:col-span-3">
             <Link href="/" aria-label={`${siteConfig.name} home`} className="inline-block rounded-sm">
               <Logo markClassName="h-8" />
             </Link>
@@ -54,7 +54,20 @@ export function Footer() {
             </ul>
           </nav>
 
-          <nav aria-label="Collections" className="lg:col-span-3">
+          <nav aria-label="Diamond categories" className="lg:col-span-2">
+            <FooterHeading>Categories</FooterHeading>
+            <ul className="space-y-3">
+              {footerNav.categories.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className={linkClass}>
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <nav aria-label="Collections" className="lg:col-span-2">
             <FooterHeading>Collections</FooterHeading>
             <ul className="space-y-3">
               {footerNav.collections.map((link) => (

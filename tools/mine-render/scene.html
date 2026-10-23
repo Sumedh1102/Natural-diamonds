@@ -1,0 +1,301 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/" } }</script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
+
+const params = new URLSearchParams(location.search);
+const view = params.get('view') ?? 'desktop';
+const segments = Number(params.get('seg') ?? 1440);
+const t = Number(params.get('t') ?? 0); // 0..1 for camera drift (video frames)
+
+const W = innerWidth, H = innerHeight;
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(W, H);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = Number(params.get('exp') ?? 1.05);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const fogColor = new THREE.Color('#c9ad8d');
+scene.fog = new THREE.FogExp2(fogColor, Number(params.get('fog') ?? 0.00017));
+
+// ---------- noise helpers ----------
+const perlin = new ImprovedNoise();
+const n2 = (x, y, s = 0) => perlin.noise(x, y, s);
+function fbm(x, y, oct = 5, seed = 0) {
+  let a = 0.5, f = 1, sum = 0;
+  for (let i = 0; i < oct; i++) { sum += a * n2(x * f, y * f, seed + i * 7.1); f *= 2.03; a *= 0.5; }
+  return sum;
+}
+const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+const lerp = (a, b, t) => a + (b - a) * t;
+
+// ---------- pit definition ----------
+const R_TOP = 640, R_BOTTOM = 92, BENCHES = 15, BENCH_H = 30;
+const BENCH_W = (R_TOP - R_BOTTOM) / BENCHES;
+const RIM_LEVEL = 18;
+const PIT_DEPTH = BENCHES * BENCH_H;
+const ELLIPSE = 0.86;
+const FLAT = 0.44, FACE_END = 0.96;
+
+// Irregular outline as a function of the polar parameter angle.
+const wobble = (th) => 1 + 0.035 * Math.sin(th * 3 + 0.7) + 0.02 * Math.sin(th * 7 + 2.1) + 0.012 * Math.sin(th * 13 + 0.3);
+
+function baseTerrain(x, z) {
+  let h = fbm(x * 0.0009, z * 0.0009, 5, 1) * 38;
+  h += fbm(x * 0.004, z * 0.004, 4, 9) * 9;
+  h += fbm(x * 0.02, z * 0.02, 3, 12) * 2.5;
+  h += Math.abs(fbm(x * 0.014, z * 0.014, 3, 20)) * 4;
+  const d = Math.hypot(x, z);
+  // distant ridges and hills, softened by haze
+  h += smooth(1700, 5200, d) * (Math.abs(fbm(x * 0.0005, z * 0.0005, 5, 40)) * 520 + 60);
+  return h;
+}
+
+function spoilHeap(x, z, cx, cz, rad, height) {
+  const r = Math.hypot((x - cx) / rad, (z - cz) / (rad * 0.62));
+  if (r > 1.3) return 0;
+  const shape = smooth(1.2, 0.5, r + fbm(x * 0.008, z * 0.008, 2, 50) * 0.12);
+  return Math.min(shape * 1.35, 1) * height;
+}
+
+// Haul road: descends ~1.4 turns from the rim to the floor.
+const ROAD_TURNS = 1.4, ROAD_W = 13, ROAD_START = 2.3;
+function roadAt(rho, th) {
+  let best = null;
+  for (let m = -1; m <= 2; m++) {
+    const phi = ((th - ROAD_START) + m * Math.PI * 2);
+    const u = phi / (ROAD_TURNS * Math.PI * 2);
+    if (u < 0 || u > 1) continue;
+    const rr = R_TOP - 8 - u * (R_TOP - R_BOTTOM - 16);
+    const dist = Math.abs(rho - rr);
+    if (dist < ROAD_W * 1.8 && (!best || dist < best.dist)) best = { dist, y: RIM_LEVEL - u * (PIT_DEPTH + 2), u };
+  }
+  return best;
+}
+
+// rho is the pit-space radius (benches are rings of constant rho).
+function heightAt(rho, x, z, out, th = 0) {
+  let h = baseTerrain(x, z);
+  const heaps = 0;
+  h += heaps;
+  let depth = 0, inPit = 0, benchTop = 0;
+  const blend = smooth(R_TOP + 220, R_TOP, rho);
+  h = lerp(h, RIM_LEVEL + heaps * 0.3, blend);
+  if (rho < R_TOP) {
+    inPit = 1;
+    const tt = (R_TOP - rho) / BENCH_W;
+    const k = Math.floor(tt), f = tt - k;
+    const face = smooth(FLAT, FACE_END, f);
+    benchTop = f < FLAT ? 1 : f > FACE_END ? 1 : 0;
+    depth = BENCH_H * (Math.min(k, BENCHES) + (k < BENCHES ? face : 0));
+    depth += (1 - benchTop) * fbm(x * 0.06, z * 0.06, 3, 70) * 3.5;
+    if (rho < R_BOTTOM) depth = PIT_DEPTH + 4;
+  }
+  let road = 0;
+  if (rho < R_TOP + 10) {
+    const rd = roadAt(rho, th);
+    if (rd) {
+      const w = 1 - smooth(ROAD_W * 0.5, ROAD_W * 1.6, rd.dist);
+      const natural = h - depth;
+      const target = rd.y;
+      // cut into the face or build a shoulder onto the bench below
+      const y = lerp(natural, target, w);
+      road = rd.dist < ROAD_W * 0.55 ? 1 : 0;
+      if (out) { out.inPit = inPit; out.depth = RIM_LEVEL - y; out.benchTop = Math.max(benchTop, road); out.road = road; out.crest = 0; }
+      return y;
+    }
+  }
+  if (out) { out.inPit = inPit; out.depth = depth; out.benchTop = benchTop; out.heaps = heaps; out.road = 0; out.crest = rho < R_TOP ? ((R_TOP - rho) / BENCH_W) % 1 : 0; }
+  return h - depth;
+}
+
+// ---------- polar terrain mesh: rings follow the bench edges ----------
+const radii = [0];
+for (let r = 8; r < R_BOTTOM; r += 14) radii.push(r);
+for (let k = BENCHES - 1; k >= 0; k--) {
+  // inner edge of bench k (deepest first)
+  const fs = [1.0, FACE_END + 0.02, FACE_END, 0.9, 0.82, 0.74, 0.66, 0.58, 0.51, FLAT + 0.015, FLAT, 0.36, 0.26, 0.16, 0.07, 0.0];
+  for (const f of fs) radii.push(R_TOP - (k + f) * BENCH_W);
+}
+let rr = R_TOP;
+while (rr < 7000) { rr += Math.max(6, (rr - R_TOP) * 0.035 + 6); radii.push(rr); }
+const uniq = [...new Set(radii.map((r) => +r.toFixed(3)))].sort((a, b) => a - b);
+const ANG = segments;
+const vcount = uniq.length * (ANG + 1);
+const posArr = new Float32Array(vcount * 3);
+const meta = new Float32Array(vcount * 4);
+const meta2 = new Float32Array(vcount * 2);
+const info = {};
+let vi = 0;
+for (let i = 0; i < uniq.length; i++) {
+  const rho = uniq[i];
+  for (let j = 0; j <= ANG; j++) {
+    const th = (j / ANG) * Math.PI * 2;
+    const wob = rho <= R_TOP + 400 ? wobble(th) : lerp(wobble(th), 1, smooth(R_TOP + 400, R_TOP + 1200, rho));
+    const x = rho * wob * Math.cos(th);
+    const z = rho * wob * Math.sin(th) * lerp(ELLIPSE, 1, smooth(R_TOP + 300, R_TOP + 1500, rho));
+    const y = heightAt(rho, x, z, info, th);
+    posArr[vi * 3] = x; posArr[vi * 3 + 1] = y; posArr[vi * 3 + 2] = z;
+    meta[vi * 4] = info.inPit; meta[vi * 4 + 1] = info.depth; meta[vi * 4 + 2] = info.benchTop; meta[vi * 4 + 3] = rho;
+    meta2[vi * 2] = info.road ?? 0; meta2[vi * 2 + 1] = info.crest ?? 0;
+    vi++;
+  }
+}
+const index = [];
+for (let i = 0; i < uniq.length - 1; i++) {
+  for (let j = 0; j < ANG; j++) {
+    const a = i * (ANG + 1) + j, b = a + 1, c = a + (ANG + 1), d = c + 1;
+    index.push(a, b, c, b, d, c);
+  }
+}
+const geo = new THREE.BufferGeometry();
+geo.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
+geo.setIndex(index);
+geo.computeVertexNormals();
+const pos = geo.attributes.position;
+
+// vertex colours
+const C = (hex) => new THREE.Color(hex);
+const strata = ['#b5835a', '#94684e', '#c39a70', '#86705f', '#a5795a', '#7a6a60', '#946f57', '#6d6b6c', '#5f6871', '#56626e'].map(C);
+const grass = C('#6c6644'), dryGrass = C('#94845c'), dirt = C('#8f7356'), rock = C('#7a6a5c'), dust = C('#bea385'), heap = C('#7f7469'), road = C('#c8ad8c');
+const colors = new Float32Array(pos.count * 3);
+const nrm = geo.attributes.normal;
+const tmp = new THREE.Color();
+for (let i = 0; i < pos.count; i++) {
+  const x = pos.getX(i), z = pos.getZ(i);
+  const slope = 1 - nrm.getY(i);
+  const inPit = meta[i * 4], depth = meta[i * 4 + 1], benchTop = meta[i * 4 + 2], rho = meta[i * 4 + 3];
+  const grit = fbm(x * 0.08, z * 0.08, 3, 90) * 0.5 + 0.5;
+  const patch = fbm(x * 0.003, z * 0.003, 4, 95);
+  if (inPit > 0.5) {
+    const wob = fbm(x * 0.004, z * 0.004, 3, 99) * 30;
+    const s = ((depth + wob) / PIT_DEPTH) * strata.length;
+    const idx = Math.max(0, Math.min(strata.length - 1, Math.floor(s)));
+    tmp.copy(strata[idx]).lerp(strata[Math.min(strata.length - 1, idx + 1)], smooth(0.7, 1, s % 1));
+    const band = Math.sin((depth + wob * 0.4) * 1.1) * 0.5 + 0.5;
+    tmp.multiplyScalar(0.8 + band * 0.22);
+    const f = meta2[i * 2 + 1];
+    if (benchTop > 0.5) tmp.lerp(depth >= PIT_DEPTH ? C('#5c625f') : road, 0.6);
+    tmp.multiplyScalar(1 + smooth(FLAT - 0.06, FLAT, f) * (1 - smooth(FLAT, FLAT + 0.04, f)) * 0.35); // lit crest
+    tmp.multiplyScalar(1 - smooth(FACE_END - 0.12, FACE_END, f) * 0.28); // shaded toe
+    if (meta2[i * 2] > 0.5) tmp.copy(road).multiplyScalar(1.05);
+  } else {
+    const heapAmt = 0;
+    tmp.copy(grass).lerp(dryGrass, smooth(-0.25, 0.35, patch)).lerp(dirt, smooth(0.2, 0.6, fbm(x * 0.008, z * 0.008, 3, 33)) * 0.55);
+    tmp.lerp(C('#4f5034'), smooth(0.1, 0.45, fbm(x * 0.012, z * 0.012, 4, 61)) * 0.55);
+    tmp.lerp(C('#a8946e'), smooth(0.25, 0.5, fbm(x * 0.02, z * 0.02, 3, 71)) * 0.4);
+    tmp.lerp(rock, smooth(0.1, 0.4, slope));
+    tmp.lerp(heap, heapAmt * 0.85);
+    tmp.lerp(dust, smooth(R_TOP + 300, R_TOP + 5, rho) * 0.6);
+  }
+  tmp.multiplyScalar(0.8 + grit * 0.32);
+  colors[i * 3] = tmp.r; colors[i * 3 + 1] = tmp.g; colors[i * 3 + 2] = tmp.b;
+}
+geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+const terrainMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0 });
+terrainMat.onBeforeCompile = (shader) => {
+  shader.vertexShader = shader.vertexShader
+    .replace('#include <common>', '#include <common>\nvarying vec3 vWPos;')
+    .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+  shader.fragmentShader = shader.fragmentShader
+    .replace('#include <common>', `#include <common>
+      varying vec3 vWPos;
+      float hsh(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);
+        return mix(mix(hsh(i), hsh(i+vec2(1,0)), f.x), mix(hsh(i+vec2(0,1)), hsh(i+vec2(1,1)), f.x), f.y); }
+      float fbm2(vec2 p){ float s = 0.0, a = 0.5; for(int i=0;i<5;i++){ s += a*vnoise(p); p *= 2.07; a *= 0.5; } return s; }`)
+    .replace('#include <color_fragment>', `#include <color_fragment>
+      float g1 = fbm2(vWPos.xz * 0.35);
+      float g2 = fbm2(vWPos.xz * 0.045 + 7.0);
+      float g3 = vnoise(vWPos.xz * 1.7);
+      diffuseColor.rgb *= 0.78 + 0.34 * g1 + 0.1 * (g3 - 0.5);
+      // scrub on the flatter, greener ground
+      float green = clamp((diffuseColor.g - diffuseColor.b) * 6.0, 0.0, 1.0);
+      float scrub = smoothstep(0.58, 0.72, fbm2(vWPos.xz * 0.11 + 3.0)) * green;
+      diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.55, 0.6, 0.45), scrub * 0.8);
+      diffuseColor.rgb *= 0.9 + 0.2 * g2;`);
+};
+const terrain = new THREE.Mesh(geo, terrainMat);
+terrain.receiveShadow = true; terrain.castShadow = true;
+scene.add(terrain);
+
+// pit lake
+const lake = new THREE.Mesh(
+  new THREE.CircleGeometry(R_BOTTOM * 0.92, 96),
+  new THREE.MeshStandardMaterial({ color: '#4f7a72', roughness: 0.12, metalness: 0.2 })
+);
+lake.rotation.x = -Math.PI / 2;
+lake.scale.set(1, ELLIPSE, 1);
+lake.position.y = RIM_LEVEL - PIT_DEPTH - 2.5;
+lake.receiveShadow = true;
+scene.add(lake);
+
+// ---------- sky ----------
+const skyGeo = new THREE.SphereGeometry(20000, 48, 24);
+const sunDir = new THREE.Vector3(Number(params.get('sx') ?? 0.35), Number(params.get('sy') ?? 0.16), Number(params.get('sz') ?? -0.92)).normalize();
+const skyMat = new THREE.ShaderMaterial({
+  side: THREE.BackSide, depthWrite: false, fog: false,
+  uniforms: { top: { value: C('#232c3a') }, mid: { value: C('#8a8584') }, horizon: { value: C('#e6bf95') }, sun: { value: sunDir } },
+  vertexShader: `varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+  fragmentShader: `uniform vec3 top; uniform vec3 mid; uniform vec3 horizon; uniform vec3 sun; varying vec3 vDir;
+    float hsh(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+    float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);
+      return mix(mix(hsh(i), hsh(i+vec2(1,0)), f.x), mix(hsh(i+vec2(0,1)), hsh(i+vec2(1,1)), f.x), f.y); }
+    float fb(vec2 p){ float s = 0.0, a = 0.5; for(int i=0;i<5;i++){ s += a*vn(p); p *= 2.1; a *= 0.5; } return s; }
+    void main(){ vec3 d = normalize(vDir); float h = clamp(d.y, -0.1, 1.0);
+      vec3 c = mix(horizon, mid, smoothstep(0.0, 0.16, h)); c = mix(c, top, smoothstep(0.14, 0.7, h));
+      float s = max(dot(d, normalize(sun)), 0.0);
+      c += vec3(1.0, 0.74, 0.45) * (pow(s, 6.0) * 0.35 + pow(s, 60.0) * 0.4 + pow(s, 800.0) * 1.0);
+      // thin stratus streaks lit from below
+      vec2 uv = d.xz / max(d.y + 0.06, 0.02);
+      float cl = smoothstep(0.52, 0.78, fb(uv * vec2(0.9, 3.2) + 4.0)) * smoothstep(0.0, 0.05, h) * (1.0 - smoothstep(0.18, 0.4, h));
+      vec3 cloudCol = mix(vec3(0.95, 0.72, 0.52), vec3(0.42, 0.40, 0.44), smoothstep(0.03, 0.25, h));
+      c = mix(c, cloudCol, cl * 0.55);
+      gl_FragColor = vec4(c, 1.0); }`
+});
+scene.add(new THREE.Mesh(skyGeo, skyMat));
+
+// ---------- lights ----------
+const hemi = new THREE.HemisphereLight('#a9b8c9', '#5c4a3a', 0.85);
+scene.add(hemi);
+const sun = new THREE.DirectionalLight('#ffd3a3', 3.1);
+sun.position.copy(sunDir).multiplyScalar(3000);
+sun.castShadow = true;
+sun.shadow.mapSize.set(4096, 4096);
+const sc = sun.shadow.camera; sc.left = -1700; sc.right = 1700; sc.top = 1700; sc.bottom = -1700; sc.near = 100; sc.far = 7000;
+sun.shadow.bias = -0.0004; sun.shadow.normalBias = 1.5;
+scene.add(sun); scene.add(sun.target);
+const fill = new THREE.DirectionalLight('#9fb2d0', 0.35);
+fill.position.set(800, 500, 900);
+scene.add(fill);
+
+// ---------- camera ----------
+const presets = {
+  desktop: { fov: 34, pos: [-260, 430, 1450], look: [-420, -40, -520] },
+  mobile: { fov: 50, pos: [120, 640, 1240], look: [80, -230, -120] },
+  custom: { fov: Number(params.get('fov') ?? 34), pos: (params.get('pos') ?? '-260,430,1450').split(',').map(Number), look: (params.get('look') ?? '-420,-40,-520').split(',').map(Number) },
+};
+const p = presets[view] ?? presets.desktop;
+const camera = new THREE.PerspectiveCamera(p.fov, W / H, 5, 30000);
+const start = new THREE.Vector3(...p.pos);
+const drift = new THREE.Vector3(140, -40, -120).multiplyScalar(t);
+camera.position.copy(start).add(drift);
+camera.lookAt(new THREE.Vector3(...p.look));
+
+renderer.render(scene, camera);
+window.__done = true;
+</script>
+</body>
+</html>

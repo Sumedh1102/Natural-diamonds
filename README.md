@@ -4,7 +4,7 @@ A standalone website for the client's natural diamond business, built with **Nex
 
 The existing site is not modified by this project. The two applications share no code, dependencies or deployment.
 
-> **Before launch:** the catalogue contains **illustrative sample listings**, and some business details need the client's confirmation. See [Before going live](#before-going-live).
+> **Before launch:** the catalogue contains **illustrative sample listings**, the homepage mine imagery is a **computer-generated render** (not a photograph of a real mine), and some business details need the client's confirmation. See [Before going live](#before-going-live).
 
 ---
 
@@ -30,25 +30,27 @@ npm run dev                  # http://localhost:3000
 
 | Route                          | Page                                                                                       |
 | ------------------------------ | ------------------------------------------------------------------------------------------ |
-| `/`                            | Homepage: hero, shape browser, collections, featured diamonds, natural story, craftsmanship, education, FAQ, consultation |
-| `/natural-diamonds`            | Catalogue with search, filters (shape, carat, colour, clarity, cut) and sorting, kept in the URL |
+| `/`                            | Homepage: mine hero → From Earth to Diamond → categories (and shapes) → featured diamonds → craftsmanship → collections → about → education → why choose us → consultation |
+| `/natural-diamonds`            | Catalogue: category tabs, search, filters (colour origin, shape, carat, colour grade, clarity, cut), sorting, grid or list view — all kept in the URL |
 | `/natural-diamonds/[slug]`     | Diamond detail: gallery, specifications, inquiry and WhatsApp CTAs, related diamonds        |
 | `/collections`                 | All collections                                                                            |
 | `/collections/[slug]`          | A collection: its diamonds, or its service process (matched pairs, bespoke jewellery)       |
 | `/about`                       | Our Story                                                                                  |
-| `/diamond-education`           | 4Cs, shapes, formation, grading reports, natural vs lab-grown (anchored sections)          |
+| `/diamond-education`           | 4Cs, shapes, formation, grading reports, natural vs lab-grown, FAQ (anchored sections)     |
 | `/contact`                     | Contact details and inquiry form (`?diamond=<slug>` or `?interest=<interest>` prefill it)  |
 | `/api/inquiry`                 | `POST` endpoint that validates inquiries and forwards them to your webhook                 |
 | `/sitemap.xml`, `/robots.txt`  | Generated from the routes and data                                                         |
 
-Catalogue URLs can be shared and linked, e.g. `/natural-diamonds?shape=oval,pear&carat=1-1.49&color=E,F&sort=carat-desc`.
+Catalogue URLs can be shared and linked, e.g. `/natural-diamonds?category=white&shape=oval,pear&carat=1-1.49&color=E,F&sort=carat-desc&view=list`. Other parameters: `origin=natural|treated`, `clarity=`, `cut=`, `q=` (search).
 
 ## Project structure
 
 ```
 public/images/        Client-owned imagery, optimised from the existing site
   brand/              NAV mark, Open Graph image
-  hero/ editorial/    Hero and story photography
+  hero/               mine-desktop / mine-mobile: rendered open-pit mine (see tools/mine-render)
+  editorial/          Story photography, plus mine-aerial (rendered)
+  colours/            Representative coloured diamonds (champagne, yellow, pink, black)
   collections/        Collection imagery
   shapes/             Cut-out photographs of each diamond shape
 src/
@@ -62,10 +64,11 @@ src/
     ui/               Buttons, headings, containers, page hero, breadcrumbs, motion
     seo/              JSON-LD helper
   config/             site.ts (business details), navigation.ts
-  data/               products, collections, shapes, education, FAQs
+  data/               products, categories, collections, shapes, education, FAQs
   lib/                Catalogue logic, inquiry validation, formatting, metadata
   types/              Shared TypeScript types
   proxy.ts            Returns a real 404 for unknown product/collection slugs
+tools/mine-render/    Offline three.js renderer for the hero mine imagery (not part of the build)
 ```
 
 Pages are Server Components. Client Components are limited to the interactive parts: the header, catalogue explorer, gallery, tabs, accordion, inquiry form and scroll reveals.
@@ -74,7 +77,7 @@ Pages are Server Components. Client Components are limited to the interactive pa
 
 ### 1. Replace the sample catalogue
 
-`src/data/products.ts` holds **12 illustrative listings** (references `NDS-101` to `NDS-112`). Their grades are examples, their images show the shape rather than the individual stone, and they carry no grading reports or prices. Each has `isSample: true`, which adds a "Sample listing" badge and an explanatory notice wherever it appears. Once no sample listings remain, the badges and notices disappear on their own.
+`src/data/products.ts` holds **16 illustrative listings** (references `NDS-101` to `NDS-116`): 12 white diamonds and one each of champagne, fancy yellow, fancy pink and treated black, so every category and the treated-colour labelling can be seen working. Their grades are examples, their images show the shape or colour rather than the individual stone, and they carry no grading reports or prices. Each has `isSample: true`, which adds a "Sample listing" badge and an explanatory notice wherever it appears. Once no sample listings remain, the badges and notices disappear on their own.
 
 For each real diamond, provide:
 
@@ -83,10 +86,14 @@ For each real diamond, provide:
   slug: "round-1-02ct-abc123",          // URL segment, unique
   reference: "ABC123",                  // stock reference shown to customers
   name: "1.02 ct Round Brilliant Natural Diamond",
+  category: "white",                    // white | champagne | fancy-colour | black
+  colourOrigin: "natural",              // "treated" for any colour treatment — always from the report
+  treatmentNote: undefined,             // e.g. "HPHT processed" for treated stones
   shape: "round",                       // see DiamondShape in src/types
   carat: 1.02,
-  color: "F",
-  clarity: "VS1",
+  color: "F",                           // D–M grade for white diamonds…
+  colorDescription: undefined,          // …or e.g. "Fancy Light Pink", "Cognac (C6)", "Black"
+  clarity: "VS1",                       // omit for opaque stones
   cut: "Excellent",                     // round brilliants only
   polish: "Excellent", symmetry: "Excellent", fluorescence: "None",
   measurements: "6.45 x 6.48 x 3.99",   // optional, mm
@@ -101,6 +108,8 @@ For each real diamond, provide:
 ```
 
 - Only set `gradingReport.verified: true` after checking the report with the issuing laboratory. Unverified reports are never displayed.
+- **Colour origin:** set `colourOrigin: "treated"` for any diamond whose colour has been treated (most black diamonds, irradiated or HPHT-processed colours). Treated stones get a "Treated colour" badge, a disclosure note and their own filter value; never mark a stone `"natural"` without the report to support it.
+- Categories and their descriptions live in `src/data/categories.ts`. A category with no listings still appears on the homepage, linking to an enquiry instead of the catalogue.
 - Filters adapt to the data: each one lists only values present in the catalogue and is hidden when there is nothing to choose between, and price sorting only appears once diamonds have prices.
 - Product structured data (JSON-LD) is output only for listings where `isSample` is `false`.
 - **Connecting an API or CMS:** change `getAllProducts()` and `getProduct()` in `src/lib/catalogue.ts` and keep returning `Product[]`. Every page uses these functions. If slugs come from an API, update the slug check in `src/proxy.ts`, or remove it and accept a streamed `noindex` 404 page with a 200 status.
@@ -117,7 +126,7 @@ Everything is in `src/config/site.ts`:
 - **Announcement bar:** edit the text, or set `announcement: null` to hide it.
 - **Budget ranges** on the inquiry form are in INR (`budgetRanges` in `src/types/index.ts`). Adjust them or remove the field.
 
-The About page (`src/app/about/page.tsx`) is written in deliberately general terms. Add verified company history, team and expertise there; do not publish claims about origin, ethics, certification or heritage that the client cannot support.
+The About page (`src/app/about/page.tsx`), the homepage "About the Brand" and "Why Choose Us" sections (`src/components/home/AboutTeaser.tsx`, `WhyChooseUs.tsx`) are written in deliberately general terms. Add verified company history, team and expertise there; do not publish claims about origin, ethics, certification or heritage that the client cannot support.
 
 ### 3. Connect the inquiry form
 
@@ -149,7 +158,15 @@ Payload sent to the webhook:
 
 Set `NEXT_PUBLIC_SITE_URL` to the production domain (e.g. `https://www.example.com`) before building. Canonical URLs, Open Graph tags, the sitemap and `robots.txt` use it. Without it they fall back to `http://localhost:3000`.
 
-### 5. Legal pages
+### 5. Replace the hero render with licensed imagery (recommended)
+
+The homepage hero (`public/images/hero/mine-desktop.webp` 2560×1440, `mine-mobile.webp` 1080×1920) and the aerial view in the origin story (`public/images/editorial/mine-aerial.webp`) are **computer-generated renders of a generic open-pit kimberlite mine**, made with `tools/mine-render` because no licensed mine photography could be obtained. They depict no specific mine, and the hero carries a small "Illustration" caption. To use licensed photography or footage instead:
+
+- Overwrite the files with the same names and similar compositions: in the landscape frame the pit sits right of centre with darker ground on the left for the text; in the portrait frame a dark sky sits at the top and the pit is centred.
+- Remove the "Illustration · open-pit kimberlite mine" captions in `src/components/home/Hero.tsx` if the new image is a photograph, and update the `alt` text there.
+- Hero video: the hero is image-only for performance. If you add a video, keep the current image as its `poster`, load it only on landscape screens, and skip autoplay when `prefers-reduced-motion` or Save-Data is set.
+
+### 6. Legal pages
 
 No privacy policy or terms pages are included, because their content must come from the client. The inquiry form collects personal data, so add a privacy notice and link it from the footer (`src/components/layout/Footer.tsx`) and the form's consent text before launch.
 
@@ -160,6 +177,8 @@ The site needs a Node.js host, because of the inquiry API route and the 404 prox
 ## Design notes
 
 - **Adapted from the existing site:** the palette, Cormorant Garamond serif, black header with a bronze hairline and growing underline on hover, glass dropdowns, a full-screen numbered serif mobile menu, the WhatsApp inquiry pill, bronze eyebrows, numbered rows, the feature-selector layout (used for the craftsmanship journey), the numbered FAQ accordion, the shapes slider, and the jewellery process copy (designing, CAD, setting and polishing, presentation). The formation and rough-to-polished copy also comes from the existing site's natural diamond page.
-- **Changed deliberately:** a photographic hero replaces the existing site's three.js diamond to keep the page fast. Headings are set in the serif throughout, and ivory sections add rhythm. Images showing lab-grown reactors, "NavLab" branding or laboratory certificates were not reused.
+- **BHC Diamonds references:** bhcdiamonds.com could not be reached from the build environment (its domain did not resolve), so its pages were not inspected directly. Published descriptions of the business informed the approach: diamonds organised by colour category, with size and quality ranges, and treated stones identified as such. That shaped the category section, the category tabs and overview on the catalogue, the colour-origin labelling and the list (spec-sheet) view. No BHC branding, assets or copy are used.
+- **Homepage storytelling:** a cinematic mine hero (rendered imagery, transparent header over it), a "From Earth to Diamond" section with a not-to-scale cross-section diagram (`EarthCrossSection.tsx`), then categories, featured diamonds, craftsmanship, collections, brand, education, why choose us and consultation. The FAQ moved to the education page.
+- **Changed deliberately:** a rendered still hero replaces the existing site's three.js diamond to keep the page fast; a slow CSS "settle" provides the only hero motion. Headings are set in the serif throughout, and ivory sections add rhythm. Images showing lab-grown reactors, "NavLab" branding or laboratory certificates were not reused.
 - **Accessibility:** skip link, landmarks, keyboard-operable menus and tabs, a native `<dialog>` for mobile filters, labelled form errors with focus management, AA colour contrast, and `prefers-reduced-motion` support (fades without movement). Content stays visible without JavaScript.
 - **Motion:** Framer Motion powers the scroll reveals and loads its animation features on demand after hydration. Other transitions are CSS.

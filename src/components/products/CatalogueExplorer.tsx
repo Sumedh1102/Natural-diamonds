@@ -3,16 +3,20 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Search, SearchX, SlidersHorizontal, X } from "lucide-react";
+import { LayoutGrid, List, Search, SearchX, SlidersHorizontal, X } from "lucide-react";
+import { getCategory } from "@/data/categories";
 import { getShape } from "@/data/shapes";
 import {
   caratRanges,
+  colourOrigins,
   countActiveFilters,
   emptyFilters,
   filterProducts,
+  getRangeSummary,
   parseFilters,
   serializeFilters,
   type CatalogueFilters,
+  type CatalogueView,
   type FilterOptions,
   type SortKey,
 } from "@/lib/catalogue";
@@ -21,9 +25,11 @@ import type { Product } from "@/types";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { FilterPanel } from "./FilterPanel";
 import { ProductGrid } from "./ProductGrid";
+import { ProductList } from "./ProductList";
 import { SampleNotice } from "./SampleNotice";
+import { StoneImage } from "./StoneImage";
 
-type ListKey = "shapes" | "carats" | "colors" | "clarities" | "cuts";
+type ListKey = "categories" | "origins" | "shapes" | "carats" | "colors" | "clarities" | "cuts";
 
 type CatalogueExplorerProps = {
   products: Product[];
@@ -93,10 +99,14 @@ export function CatalogueExplorer({ products, options }: CatalogueExplorerProps)
   };
 
   const setSort = (sort: SortKey) => writeUrl({ ...activeFilters, sort });
+  const setView = (view: CatalogueView) => writeUrl({ ...activeFilters, view });
+  // Category tabs pick a single category; the chips below allow combinations.
+  const setCategory = (id: (typeof filters.categories)[number] | null) =>
+    writeUrl({ ...activeFilters, categories: id ? [id] : [] });
 
   const clearAll = () => {
     setDraft({ value: "", base: "" });
-    writeUrl({ ...emptyFilters, sort: filters.sort });
+    writeUrl({ ...emptyFilters, sort: filters.sort, view: filters.view });
   };
 
   const clearQuery = () => {
@@ -105,6 +115,12 @@ export function CatalogueExplorer({ products, options }: CatalogueExplorerProps)
   };
 
   const chips: { key: ListKey; value: string; label: string }[] = [
+    ...filters.categories.map((value) => ({ key: "categories" as const, value, label: getCategory(value).shortLabel })),
+    ...filters.origins.map((value) => ({
+      key: "origins" as const,
+      value,
+      label: colourOrigins.find((origin) => origin.value === value)?.label ?? value,
+    })),
     ...filters.shapes.map((value) => ({ key: "shapes" as const, value, label: getShape(value).label })),
     ...filters.carats.map((value) => ({
       key: "carats" as const,
@@ -117,9 +133,13 @@ export function CatalogueExplorer({ products, options }: CatalogueExplorerProps)
   ];
 
   const resultsLabel = `${results.length} of ${products.length} natural ${products.length === 1 ? "diamond" : "diamonds"}`;
+  const singleCategory = filters.categories.length === 1 ? getCategory(filters.categories[0]) : null;
+  const categorySummary = singleCategory
+    ? getRangeSummary(products.filter((product) => product.category === singleCategory.id))
+    : null;
 
   return (
-    <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
+    <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
       {/* Desktop filters */}
       <aside aria-label="Filters" className="hidden lg:col-span-3 lg:block">
         <div className="pb-8">
@@ -139,7 +159,77 @@ export function CatalogueExplorer({ products, options }: CatalogueExplorerProps)
         </div>
       </aside>
 
-      <div className="lg:col-span-9">
+      <div className="min-w-0 lg:col-span-9">
+        {options.categories.length > 1 && (
+          <div className="mb-6 border-b border-white/10">
+            <div
+              role="group"
+              aria-label="Diamond category"
+              className="scrollbar-none -mx-4 flex gap-1 overflow-x-auto px-4 sm:mx-0 sm:px-0"
+            >
+              {[{ id: null, shortLabel: "All diamonds", count: products.length }, ...options.categories].map((tab) => {
+                const active = tab.id ? filters.categories.length === 1 && filters.categories[0] === tab.id : filters.categories.length === 0;
+                return (
+                  <button
+                    key={tab.id ?? "all"}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setCategory(tab.id)}
+                    className={cn(
+                      "relative inline-flex min-h-12 shrink-0 items-center gap-2 px-4 text-[11px] uppercase tracking-[0.18em] transition-colors",
+                      active ? "text-white" : "text-white/60 hover:text-white",
+                    )}
+                  >
+                    {tab.shortLabel}
+                    <span className={cn("text-[10px] tabular-nums", active ? "text-bronze" : "text-white/60")}>{tab.count}</span>
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "absolute inset-x-3 -bottom-px h-px bg-bronze transition-transform duration-300",
+                        active ? "scale-x-100" : "scale-x-0",
+                      )}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {singleCategory && categorySummary && (
+          <div className="mb-8 grid gap-6 rounded-2xl border border-white/10 bg-white/[0.02] p-5 sm:grid-cols-[auto_1fr] sm:items-center sm:p-6">
+            <StoneImage src={singleCategory.image} alt="" sizes="96px" className="size-20 rounded-xl sm:size-24" />
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.25em] text-bronze">{singleCategory.eyebrow}</p>
+              <h2 className="mt-1 font-serif text-2xl font-light text-white">{singleCategory.label}</h2>
+              <p className="mt-2 text-sm leading-relaxed text-white/60">{singleCategory.summary}</p>
+              <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs">
+                <div>
+                  <dt className="inline text-white/50">Listings </dt>
+                  <dd className="inline text-white/85">{categorySummary.count}</dd>
+                </div>
+                <div>
+                  <dt className="inline text-white/50">Carat </dt>
+                  <dd className="inline text-white/85">{categorySummary.carat}</dd>
+                </div>
+                {categorySummary.color && (
+                  <div>
+                    <dt className="inline text-white/50">Colour </dt>
+                    <dd className="inline text-white/85">{categorySummary.color}</dd>
+                  </div>
+                )}
+                {categorySummary.clarity && (
+                  <div>
+                    <dt className="inline text-white/50">Clarity </dt>
+                    <dd className="inline text-white/85">{categorySummary.clarity}</dd>
+                  </div>
+                )}
+              </dl>
+              <p className="mt-3 text-xs text-white/50">{singleCategory.grading}</p>
+            </div>
+          </div>
+        )}
+
         {/* Toolbar */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative flex-1">
@@ -193,7 +283,7 @@ export function CatalogueExplorer({ products, options }: CatalogueExplorerProps)
                 id={`${idPrefix}-sort`}
                 value={filters.sort}
                 onChange={(event) => setSort(event.target.value as SortKey)}
-                className="h-12 w-full cursor-pointer appearance-none rounded-full border border-white/15 bg-ink pl-5 pr-10 text-[11px] uppercase tracking-[0.15em] text-white transition-colors hover:border-white/40 focus:border-bronze focus:outline-none sm:w-auto"
+                className="h-12 w-full cursor-pointer appearance-none rounded-full border border-white/15 bg-ink pl-4 pr-8 text-[13px] text-white transition-colors hover:border-white/40 focus:border-bronze focus:outline-none sm:w-auto sm:pl-5 sm:pr-10 sm:text-[11px] sm:uppercase sm:tracking-[0.15em]"
               >
                 {options.sorts.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -201,9 +291,32 @@ export function CatalogueExplorer({ products, options }: CatalogueExplorerProps)
                   </option>
                 ))}
               </select>
-              <span aria-hidden="true" className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white/60">
+              <span aria-hidden="true" className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-white/60 sm:right-4">
                 ▾
               </span>
+            </div>
+
+            <div role="group" aria-label="Layout" className="flex h-12 shrink-0 rounded-full border border-white/15 p-1">
+              {(
+                [
+                  { value: "grid", label: "Grid view", icon: LayoutGrid },
+                  { value: "list", label: "List view", icon: List },
+                ] as const
+              ).map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  aria-pressed={filters.view === option.value}
+                  aria-label={option.label}
+                  onClick={() => setView(option.value)}
+                  className={cn(
+                    "flex w-10 items-center justify-center rounded-full transition-colors",
+                    filters.view === option.value ? "bg-bronze text-ink-900" : "text-white/60 hover:text-white",
+                  )}
+                >
+                  <option.icon aria-hidden="true" className="size-4" />
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -240,7 +353,11 @@ export function CatalogueExplorer({ products, options }: CatalogueExplorerProps)
         <SampleNotice show={results.some((product) => product.isSample)} className="mt-6" />
 
         {results.length > 0 ? (
-          <ProductGrid products={results} className="mt-8" sizes="(min-width: 1280px) 22rem, (min-width: 640px) 45vw, 92vw" />
+          filters.view === "list" ? (
+            <ProductList products={results} className="mt-8" />
+          ) : (
+            <ProductGrid products={results} className="mt-8" sizes="(min-width: 1280px) 22rem, (min-width: 640px) 45vw, 92vw" />
+          )
         ) : (
           <div className="mt-8 flex flex-col items-center rounded-2xl border border-dashed border-white/15 px-6 py-16 text-center sm:py-20">
             <span className="flex size-14 items-center justify-center rounded-full border border-white/15 text-bronze">

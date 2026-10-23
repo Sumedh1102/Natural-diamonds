@@ -1,56 +1,40 @@
+import { AboutTeaser } from "@/components/home/AboutTeaser";
+import { CategoriesSection } from "@/components/home/CategoriesSection";
 import { ConsultationCta } from "@/components/home/ConsultationCta";
 import { Craftsmanship } from "@/components/home/Craftsmanship";
 import { EducationTeaser } from "@/components/home/EducationTeaser";
-import { FaqSection } from "@/components/home/FaqSection";
 import { FeaturedCollections } from "@/components/home/FeaturedCollections";
 import { FeaturedDiamonds } from "@/components/home/FeaturedDiamonds";
 import { Hero } from "@/components/home/Hero";
-import { NaturalStory } from "@/components/home/NaturalStory";
-import { ShapeRail } from "@/components/home/ShapeRail";
-import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { OriginJourney } from "@/components/home/OriginJourney";
+import { WhyChooseUs } from "@/components/home/WhyChooseUs";
 import { siteConfig } from "@/config/site";
-import { getAllProducts, getFilterOptions } from "@/lib/catalogue";
 import { pageMetadata } from "@/lib/metadata";
 
 export const metadata = pageMetadata({
-  title: `${siteConfig.name} — Nature's Rarest Expression of Beauty`,
+  title: `${siteConfig.name} — Mined by Nature. Defined by Time.`,
   description: siteConfig.description,
   path: "/",
   absoluteTitle: true,
 });
 
+/*
+ * The homepage follows a natural diamond from the Earth to the finished stone:
+ * origin → categories → featured diamonds → craftsmanship → collections →
+ * brand → education → why choose us → consultation.
+ */
 export default function HomePage() {
-  const { shapes } = getFilterOptions(getAllProducts());
-
   return (
     <>
       <Hero />
-
-      <section aria-labelledby="shapes-title" className="pt-20 sm:pt-24 lg:pt-28">
-        <Container>
-          <SectionHeading
-            eyebrow="Shop by Shape"
-            title={
-              <span id="shapes-title">
-                Shapes of <em>Natural Diamonds</em>
-              </span>
-            }
-            description="Every outline has its own character. Choose a shape to see the natural diamonds available in it."
-            size="md"
-          />
-          <div className="mt-6">
-            <ShapeRail shapes={shapes} />
-          </div>
-        </Container>
-      </section>
-
-      <FeaturedCollections />
+      <OriginJourney />
+      <CategoriesSection />
       <FeaturedDiamonds />
-      <NaturalStory />
       <Craftsmanship />
+      <FeaturedCollections />
+      <AboutTeaser />
       <EducationTeaser />
-      <FaqSection />
+      <WhyChooseUs />
       <ConsultationCta />
     </>
   );

@@ -5,7 +5,7 @@ import { SampleNotice } from "@/components/products/SampleNotice";
 import { Container } from "@/components/ui/Container";
 import { PageHero } from "@/components/ui/PageHero";
 import { ConsultationCta } from "@/components/home/ConsultationCta";
-import { getAllProducts, getFilterOptions } from "@/lib/catalogue";
+import { getAllProducts, getFilterOptions, getRangeSummary } from "@/lib/catalogue";
 import { pageMetadata } from "@/lib/metadata";
 import type { Product } from "@/types";
 
@@ -40,6 +40,15 @@ function CatalogueFallback({ products }: { products: Product[] }) {
 export default function NaturalDiamondsPage() {
   const products = getAllProducts();
   const options = getFilterOptions(products);
+  const summary = getRangeSummary(products);
+  const stats = summary
+    ? [
+        { value: String(summary.count), label: "Diamonds listed" },
+        { value: String(options.categories.length), label: options.categories.length === 1 ? "Category" : "Categories" },
+        { value: String(summary.shapes), label: summary.shapes === 1 ? "Shape" : "Shapes" },
+        { value: summary.carat.replace(" ct", ""), label: "Carat range" },
+      ]
+    : [];
 
   return (
     <>
@@ -50,13 +59,24 @@ export default function NaturalDiamondsPage() {
             Natural <em>Diamonds</em>
           </>
         }
-        description="Each diamond here was formed by nature. Search and refine by shape, carat weight, colour and clarity, then open any listing for its full specifications."
+        description="Each diamond here was formed by nature. Browse by category, refine by shape, carat weight, colour and clarity, and compare listings side by side before you enquire."
         breadcrumbs={[{ label: "Natural Diamonds" }]}
         image={{
           src: "/images/collections/loose-diamonds-velvet.webp",
           alt: "Loose natural diamonds in different shapes on black velvet",
         }}
-      />
+      >
+        {stats.length > 0 && (
+          <dl className="grid max-w-2xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-4">
+            {stats.map((stat) => (
+              <div key={stat.label} className="flex flex-col-reverse bg-ink-900 px-5 py-4">
+                <dt className="mt-1 text-[10px] uppercase tracking-[0.2em] text-white/55">{stat.label}</dt>
+                <dd className="font-serif text-2xl font-light text-white">{stat.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+      </PageHero>
 
       <section aria-label="Diamond catalogue" className="py-12 sm:py-16 lg:py-20">
         <Container>

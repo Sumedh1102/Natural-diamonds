@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Offline asset tooling, not part of the app.
+    "tools/**",
   ]),
 ]);
 

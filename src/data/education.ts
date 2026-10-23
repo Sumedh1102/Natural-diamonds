@@ -93,13 +93,44 @@ export const formation = {
   ],
 };
 
+/** From the mantle to the rough diamond: general geology, no sourcing claims. */
+export const originSteps: {
+  title: string;
+  meta: string;
+  text: string;
+  image?: { src: string; alt: string };
+}[] = [
+  {
+    title: "Formed Deep in the Mantle",
+    meta: "150–200 km below the surface",
+    text: "Under immense heat and pressure, carbon atoms lock into the diamond crystal lattice. Most natural diamonds formed between one and three and a half billion years ago.",
+  },
+  {
+    title: "Carried to the Surface",
+    meta: "Kimberlite eruptions",
+    text: "Rare, deep-sourced volcanic eruptions rushed diamond-bearing rock upward, cooling into carrot-shaped kimberlite pipes that hold diamonds near the surface.",
+  },
+  {
+    title: "Recovered from the Earth",
+    meta: "Open-pit, underground and alluvial",
+    text: "Diamonds are recovered from these pipes in open-pit and underground mines, or from alluvial deposits where rivers and erosion carried them over time.",
+    image: { src: "/images/editorial/mine-aerial.webp", alt: "Aerial view of a terraced open-pit mine with a spiral haul road (illustration)" },
+  },
+  {
+    title: "The Rough Revealed",
+    meta: "Sorting the rough",
+    text: "Recovered rough is sorted by size, shape, colour and quality — the first step on its journey to becoming a polished natural diamond.",
+    image: { src: "/images/editorial/rough-crystals.webp", alt: "Three rough natural diamond crystals" },
+  },
+];
+
 /** The journey from rough to polished, adapted from the existing NAV site. */
 export const craftSteps = [
   {
     title: "Planning",
     quote: "The rough diamond is examined carefully to decide how it should be cut.",
     text: "Experts study the stone's size, shape, natural inclusions and internal structure, planning a cut that brings out brilliance and symmetry while preserving as much of the crystal as possible.",
-    image: { src: "/images/editorial/rough-crystals.webp", alt: "Three rough diamond crystals on a dark background" },
+    image: { src: "/images/editorial/rough-and-polished.webp", alt: "Rough diamond crystals beside a polished Asscher-cut diamond" },
   },
   {
     title: "Cleaving & Sawing",
@@ -117,7 +148,7 @@ export const craftSteps = [
     title: "Grading",
     quote: "Finally, the diamond is assessed against the 4Cs.",
     text: "Cut, colour, clarity and carat weight are evaluated to describe the diamond's quality. Independent laboratories can also issue a grading report.",
-    image: { src: "/images/editorial/rough-and-polished.webp", alt: "Rough diamond crystals beside a polished Asscher-cut diamond" },
+    image: { src: "/images/collections/shapes-chart.webp", alt: "Polished diamonds of many shapes laid out in rows for grading" },
   },
 ];
 

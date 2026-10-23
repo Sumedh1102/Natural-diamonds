@@ -1,3 +1,4 @@
+import { categories } from "@/data/categories";
 import { collections } from "@/data/collections";
 
 export type NavChild = {
@@ -16,7 +17,16 @@ export type NavItem = {
 
 export const mainNav: NavItem[] = [
   { label: "Home", href: "/" },
-  { label: "Natural Diamonds", href: "/natural-diamonds" },
+  {
+    label: "Natural Diamonds",
+    href: "/natural-diamonds",
+    children: categories.map((category) => ({
+      label: category.label,
+      href: `/natural-diamonds?category=${category.id}`,
+      description: category.eyebrow,
+    })),
+    allLink: { label: "View all natural diamonds", href: "/natural-diamonds" },
+  },
   {
     label: "Collections",
     href: "/collections",
@@ -50,6 +60,10 @@ export const footerNav = {
     { label: "Diamond Education", href: "/diamond-education" },
     { label: "Contact & Consultation", href: "/contact" },
   ],
+  categories: categories.map((category) => ({
+    label: category.label,
+    href: `/natural-diamonds?category=${category.id}`,
+  })),
   collections: collections.map((collection) => ({
     label: collection.title,
     href: `/collections/${collection.slug}`,

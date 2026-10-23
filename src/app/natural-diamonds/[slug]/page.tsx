@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { ArrowRight, ExternalLink, MessageCircle } from "lucide-react";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { ProductGrid } from "@/components/products/ProductGrid";
+import { TreatedBadge } from "@/components/products/ProductCard";
 import { SampleBadge, SampleNotice } from "@/components/products/SampleNotice";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
@@ -13,9 +14,10 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { WhatsAppIcon } from "@/components/ui/icons";
 import { absoluteUrl, siteConfig, whatsappHref } from "@/config/site";
+import { getCategory } from "@/data/categories";
 import { getShape } from "@/data/shapes";
 import { getAllProducts, getProduct, getRelatedProducts } from "@/lib/catalogue";
-import { formatCarat, priceLabel } from "@/lib/format";
+import { colorLabel, formatCarat, priceLabel } from "@/lib/format";
 import { pageMetadata } from "@/lib/metadata";
 import type { Product } from "@/types";
 
@@ -30,7 +32,7 @@ export async function generateMetadata({ params }: PageProps<"/natural-diamonds/
   const shape = getShape(product.shape);
   return pageMetadata({
     title: product.name,
-    description: `${formatCarat(product.carat)} ${shape.label.toLowerCase()} natural diamond, ${product.color} colour, ${product.clarity} clarity${product.cut ? `, ${product.cut} cut` : ""}. Reference ${product.reference}. ${product.description}`,
+    description: `${formatCarat(product.carat)} ${shape.label.toLowerCase()} natural diamond, ${colorLabel(product)} colour${product.clarity ? `, ${product.clarity} clarity` : ""}${product.cut ? `, ${product.cut} cut` : ""}${product.colourOrigin === "treated" ? ", treated colour" : ""}. Reference ${product.reference}. ${product.description}`,
     path: `/natural-diamonds/${product.slug}`,
   });
 }
@@ -40,13 +42,34 @@ function specRows(product: Product) {
   const report = product.gradingReport;
   const rows: { label: string; value: ReactNode }[] = [
     { label: "Diamond type", value: "Natural diamond" },
+    { label: "Category", value: getCategory(product.category).label },
+    {
+      label: "Colour origin",
+      value:
+        product.colourOrigin === "treated" ? (
+          <span className="text-amber-200">Treated{product.treatmentNote ? ` — ${product.treatmentNote}` : ""}</span>
+        ) : (
+          "Natural colour"
+        ),
+    },
     { label: "Shape", value: shape.label },
     { label: "Carat weight", value: formatCarat(product.carat) },
-    { label: "Colour", value: product.color },
-    { label: "Clarity", value: product.clarity },
+    { label: "Colour", value: colorLabel(product) },
+    {
+      label: "Clarity",
+      value: product.clarity ?? <span className="text-white/55">Not graded (opaque stone)</span>,
+    },
     {
       label: "Cut grade",
-      value: product.cut ?? <span className="text-white/55">Not graded for fancy shapes</span>,
+      value: product.cut ?? (
+        <span className="text-white/55">
+          {product.category !== "white"
+            ? "Not graded for coloured diamonds"
+            : product.shape === "round"
+              ? "Not graded"
+              : "Not graded for fancy shapes"}
+        </span>
+      ),
     },
   ];
   if (product.polish) rows.push({ label: "Polish", value: product.polish });
@@ -88,8 +111,8 @@ export default async function ProductPage({ params }: PageProps<"/natural-diamon
   const inquiryMessage = `Hello, I would like to ask about the natural diamond ${product.reference} (${product.name}).`;
   const keySpecs = [
     { label: "Carat", value: formatCarat(product.carat) },
-    { label: "Colour", value: product.color },
-    { label: "Clarity", value: product.clarity },
+    { label: "Colour", value: colorLabel(product) },
+    { label: "Clarity", value: product.clarity ?? "—" },
     { label: "Cut", value: product.cut ?? "—" },
   ];
 
@@ -113,6 +136,10 @@ export default async function ProductPage({ params }: PageProps<"/natural-diamon
                 <span className="rounded-full border border-bronze/40 bg-bronze/10 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.22em] text-bronze-200">
                   Natural Diamond
                 </span>
+                <span className="rounded-full border border-white/15 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.22em] text-white/75">
+                  {getCategory(product.category).label}
+                </span>
+                {product.colourOrigin === "treated" && <TreatedBadge className="bg-transparent" />}
                 {product.isSample && <SampleBadge className="bg-transparent" />}
               </div>
               <p className="mt-6 text-[11px] uppercase tracking-[0.28em] text-bronze">
@@ -130,10 +157,23 @@ export default async function ProductPage({ params }: PageProps<"/natural-diamon
                     className={`p-5 text-center ${index % 2 === 1 ? "border-l border-white/10" : ""} ${index >= 2 ? "border-t border-white/10 sm:border-t-0" : ""} ${index === 2 ? "sm:border-l" : ""}`}
                   >
                     <dt className="text-[10px] uppercase tracking-[0.22em] text-white/55">{spec.label}</dt>
-                    <dd className="mt-2 font-serif text-2xl text-white">{spec.value}</dd>
+                    <dd className={`mt-2 font-serif leading-tight text-white ${spec.value.length > 8 ? "text-lg" : "text-2xl"}`}>
+                      {spec.value}
+                    </dd>
                   </div>
                 ))}
               </dl>
+
+              {product.colourOrigin === "treated" && (
+                <p
+                  role="note"
+                  className="mt-6 rounded-xl border border-amber-300/30 bg-amber-950/40 p-4 text-sm leading-relaxed text-amber-100/90"
+                >
+                  <strong className="font-medium text-amber-100">Treated colour.</strong> This is a natural diamond whose
+                  colour has been altered by treatment. Treated diamonds are always disclosed as such and are valued
+                  differently from diamonds with natural colour.
+                </p>
+              )}
 
               <div className="mt-8 flex flex-col gap-1 border-b border-white/10 pb-8">
                 <span className="text-[10px] uppercase tracking-[0.22em] text-white/55">Price</span>

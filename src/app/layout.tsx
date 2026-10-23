@@ -26,7 +26,7 @@ const jost = Jost({
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `${siteConfig.name} — Nature's Rarest Expression of Beauty`,
+    default: `${siteConfig.name} — Mined by Nature. Defined by Time.`,
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,

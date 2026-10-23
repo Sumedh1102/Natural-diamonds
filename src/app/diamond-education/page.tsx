@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, FileCheck2, Hash, Microscope, Scale } from "lucide-react";
 import { ConsultationCta } from "@/components/home/ConsultationCta";
+import { FaqSection } from "@/components/home/FaqSection";
 import { Container } from "@/components/ui/Container";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/ui/Reveal";
@@ -23,6 +24,7 @@ const sections = [
   { id: "formation", label: "Formation" },
   { id: "certification", label: "Grading reports" },
   { id: "natural-and-lab-grown", label: "Natural vs lab-grown" },
+  { id: "faq", label: "FAQ" },
 ];
 
 /** Approximate face-up diameters for well-proportioned round brilliants. */
@@ -405,6 +407,10 @@ export default function DiamondEducationPage() {
           </div>
         </Container>
       </section>
+
+      <div id="faq">
+        <FaqSection />
+      </div>
 
       <ConsultationCta
         title={

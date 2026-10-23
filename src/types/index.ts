@@ -51,15 +51,45 @@ export type Price = {
   currency: string;
 };
 
+/** Colour families used to organise the catalogue. */
+export type DiamondCategory = "white" | "champagne" | "fancy-colour" | "black";
+
+/**
+ * Whether a diamond's colour is as it formed in nature or the result of a
+ * treatment (heat, irradiation, HPHT, coating…). Treated stones are always
+ * labelled as such. Take this from the grading report, never assume it.
+ */
+export type ColourOrigin = "natural" | "treated";
+
+export type CategoryInfo = {
+  id: DiamondCategory;
+  label: string;
+  /** Compact label for badges and tabs. */
+  shortLabel: string;
+  eyebrow: string;
+  summary: string;
+  /** How colour is described or graded in this category. */
+  grading: string;
+  image: string;
+};
+
 export type Product = {
   slug: string;
   /** Internal stock reference shown to customers. */
   reference: string;
   name: string;
+  category: DiamondCategory;
+  colourOrigin: ColourOrigin;
+  /** Optional detail shown with a treated colour, e.g. "HPHT processed". */
+  treatmentNote?: string;
   shape: DiamondShape;
   carat: number;
-  color: ColorGrade;
-  clarity: ClarityGrade;
+  /** D–M grade for colourless to near-colourless (white) diamonds. */
+  color?: ColorGrade;
+  /** Colour description for champagne, fancy colour and black diamonds, e.g. "Fancy Yellow". */
+  colorDescription?: string;
+  /** Not graded for opaque stones such as black diamonds. */
+  clarity?: ClarityGrade;
   cut?: CutGrade;
   polish?: FinishGrade;
   symmetry?: FinishGrade;

@@ -5,7 +5,7 @@ const defaultImage = {
   url: "/images/brand/og-image.jpg",
   width: 1200,
   height: 630,
-  alt: `${siteConfig.name} — Nature's Rarest Expression of Beauty`,
+  alt: `${siteConfig.name} — Mined by Nature. Defined by Time.`,
 };
 
 type PageMetadataInput = {

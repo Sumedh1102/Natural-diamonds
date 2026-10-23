@@ -7,7 +7,7 @@ import { getShape } from "@/data/shapes";
 import type { CatalogueFilters, FilterOptions } from "@/lib/catalogue";
 import { cn } from "@/lib/format";
 
-type ListKey = "shapes" | "carats" | "colors" | "clarities" | "cuts";
+type ListKey = "categories" | "origins" | "shapes" | "carats" | "colors" | "clarities" | "cuts";
 
 type FilterPanelProps = {
   filters: CatalogueFilters;
@@ -87,6 +87,22 @@ export function FilterPanel({ filters, options, onToggle, idPrefix }: FilterPane
         </Group>
       )}
 
+      {options.origins.length > 1 && (
+        <Group
+          title="Colour origin"
+          id={`${idPrefix}-origin`}
+          hint="Treated diamonds are natural diamonds whose colour has been altered. They are always labelled."
+        >
+          <div className="flex flex-wrap gap-2">
+            {options.origins.map((origin) => (
+              <Chip key={origin.value} pressed={filters.origins.includes(origin.value)} onClick={() => onToggle("origins", origin.value)}>
+                {origin.label}
+              </Chip>
+            ))}
+          </div>
+        </Group>
+      )}
+
       {options.carats.length > 1 && (
         <Group title="Carat weight" id={`${idPrefix}-carat`}>
           <div className="flex flex-wrap gap-2">
@@ -100,7 +116,7 @@ export function FilterPanel({ filters, options, onToggle, idPrefix }: FilterPane
       )}
 
       {options.colors.length > 1 && (
-        <Group title="Colour" id={`${idPrefix}-color`} hint="D is colourless; each step along the scale shows slightly more warmth.">
+        <Group title="Colour grade" id={`${idPrefix}-color`} hint="For white diamonds. D is colourless; each step along the scale shows slightly more warmth.">
           <div className="flex flex-wrap gap-2">
             {options.colors.map((grade) => (
               <Chip key={grade} pressed={filters.colors.includes(grade)} onClick={() => onToggle("colors", grade)}>

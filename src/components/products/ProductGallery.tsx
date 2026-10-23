@@ -97,7 +97,7 @@ export function ProductGallery({ images, productName, representative = false }: 
 
       {representative && (
         <p className="mt-4 text-xs leading-relaxed text-white/55">
-          Representative image of the shape. Ask us for photographs of the individual diamond.
+          Representative image of this shape and colour. Ask us for photographs of the individual diamond.
         </p>
       )}
     </div>

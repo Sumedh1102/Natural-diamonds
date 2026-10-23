@@ -52,6 +52,19 @@
   }
 }
 
+/* Landscape layouts (desktop, landscape tablets) vs portrait layouts (phones, portrait tablets). */
+@custom-variant wide (@media (min-aspect-ratio: 5/4));
+
+/* Slow settle of the hero image on load. */
+@keyframes settle {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
 /* Entrance used by hero copy (animate-[rise_...]). */
 @keyframes rise {
   from {

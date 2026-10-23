@@ -1,0 +1,14 @@
+{
+  "name": "mine-render",
+  "private": true,
+  "type": "module",
+  "description": "Offline renderer for the homepage mine imagery. Not part of the website build.",
+  "scripts": {
+    "serve": "python3 -m http.server 8765",
+    "render": "node render.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1",
+    "three": "0.186.1"
+  }
+}
