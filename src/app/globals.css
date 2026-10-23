@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens. The palette follows the existing NAV site: charcoal grounds
+ * (#1A1A1A), a black header, a bronze accent (#B88A6A) and champagne highlights.
+ * Ivory is used for lighter editorial sections.
+ */
+@theme {
+  --color-ink: #1a1a1a;
+  --color-ink-950: #0b0b0b;
+  --color-ink-900: #111111;
+  --color-ink-850: #151515;
+  --color-ink-800: #202020;
+
+  --color-bronze: #b88a6a;
+  --color-bronze-700: #8a5f42;
+  --color-bronze-600: #a67958;
+  --color-bronze-400: #c99d7b;
+  --color-bronze-300: #d9b592;
+  --color-bronze-200: #e3c7a5;
+  --color-champagne: #f7e7ce;
+
+  --color-ivory: #f6f1ea;
+  --color-ivory-200: #ece4d8;
+  --color-ivory-300: #ddd2c3;
+  --color-taupe: #6b6158;
+  --color-umber: #2b2420;
+
+  --ease-luxe: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-float: float 9s ease-in-out infinite;
+  --animate-shimmer: shimmer 6s ease-in-out infinite;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
+  }
+
+  @keyframes shimmer {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 0.9;
+    }
+  }
+}
+
+/* Entrance used by hero copy (animate-[rise_...]). */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Font variables are set on <html> by next/font, so map them inline. */
+@theme inline {
+  --font-sans: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: rgb(255 255 255 / 0.82);
+    font-family: var(--font-sans);
+    font-weight: 300;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: rgb(184 138 106 / 0.35);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-bronze);
+    outline-offset: 3px;
+  }
+
+  /* Anchored sections land below the fixed header. */
+  [id] {
+    scroll-margin-top: 7rem;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@utility text-gold-gradient {
+  background-image: linear-gradient(90deg, #c9a27e, #f7e7ce 50%, #c9a27e);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+@utility hairline-bronze {
+  background-image: linear-gradient(90deg, transparent, rgb(184 138 106 / 0.7), transparent);
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Soft vignette that lets photography on black blend into the charcoal ground. */
+@utility mask-vignette {
+  mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
+  -webkit-mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
+}
