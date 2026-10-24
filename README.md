@@ -49,6 +49,7 @@ Catalogue URLs can be shared and linked, e.g. `/natural-diamonds?category=white&
 public/images/        Client-owned imagery, optimised from the existing site
   brand/              NAV mark, Open Graph image
   hero/               mine-desktop / mine-mobile: rendered open-pit mine (see tools/mine-render)
+public/models/        diamond.glb: the hero's turning diamond (made by tools/diamond-model)
   editorial/          Story photography, plus mine-aerial (rendered)
   colours/            Representative coloured diamonds (champagne, yellow, pink, black)
   collections/        Collection imagery
@@ -69,9 +70,10 @@ src/
   types/              Shared TypeScript types
   proxy.ts            Returns a real 404 for unknown product/collection slugs
 tools/mine-render/    Offline three.js renderer for the hero mine imagery (not part of the build)
+tools/diamond-model/  Source and optimiser for the hero diamond model, with its licence (not part of the build)
 ```
 
-Pages are Server Components. Client Components are limited to the interactive parts: the header, catalogue explorer, gallery, tabs, accordion, inquiry form and scroll reveals.
+Pages are Server Components. Client Components are limited to the interactive parts: the header, catalogue explorer, gallery, tabs, accordion, inquiry form, scroll reveals and the hero diamond.
 
 ## Before going live
 
@@ -164,7 +166,9 @@ The homepage hero (`public/images/hero/mine-desktop.webp` 2560×1440, `mine-mobi
 
 - Overwrite the files with the same names and similar compositions: in the landscape frame the pit sits right of centre with darker ground on the left for the text; in the portrait frame a dark sky sits at the top and the pit is centred.
 - Remove the "Illustration · open-pit kimberlite mine" captions in `src/components/home/Hero.tsx` if the new image is a photograph, and update the `alt` text there.
-- Hero video: the hero is image-only for performance. If you add a video, keep the current image as its `poster`, load it only on landscape screens, and skip autoplay when `prefers-reduced-motion` or Save-Data is set.
+- Hero video: the hero background is image-only for performance. If you add a video, keep the current image as its `poster`, load it only on landscape screens, and skip autoplay when `prefers-reduced-motion` or Save-Data is set.
+
+The turning diamond over the mine is a third-party 3D model, **"Diamond" by Karolina Renkiewicz, CC BY 4.0**. Its licence requires the credit shown in the hero, so keep it (or replace the model, see `tools/diamond-model/README.md`).
 
 ### 6. Legal pages
 
@@ -179,6 +183,7 @@ The site needs a Node.js host, because of the inquiry API route and the 404 prox
 - **Adapted from the existing site:** the palette, Cormorant Garamond serif, black header with a bronze hairline and growing underline on hover, glass dropdowns, a full-screen numbered serif mobile menu, the WhatsApp inquiry pill, bronze eyebrows, numbered rows, the feature-selector layout (used for the craftsmanship journey), the numbered FAQ accordion, the shapes slider, and the jewellery process copy (designing, CAD, setting and polishing, presentation). The formation and rough-to-polished copy also comes from the existing site's natural diamond page.
 - **BHC Diamonds references:** bhcdiamonds.com could not be reached from the build environment (its domain did not resolve), so its pages were not inspected directly. Published descriptions of the business informed the approach: diamonds organised by colour category, with size and quality ranges, and treated stones identified as such. That shaped the category section, the category tabs and overview on the catalogue, the colour-origin labelling and the list (spec-sheet) view. No BHC branding, assets or copy are used.
 - **Homepage storytelling:** a cinematic mine hero (rendered imagery, transparent header over it), a "From Earth to Diamond" section with a not-to-scale cross-section diagram (`EarthCrossSection.tsx`), then categories, featured diamonds, craftsmanship, collections, brand, education, why choose us and consultation. The FAQ moved to the education page.
-- **Changed deliberately:** a rendered still hero replaces the existing site's three.js diamond to keep the page fast; a slow CSS "settle" provides the only hero motion. Headings are set in the serif throughout, and ivory sections add rhythm. Images showing lab-grown reactors, "NavLab" branding or laboratory certificates were not reused.
+- **Hero diamond:** a 3D diamond turns slowly above the mine (`HeroDiamond.tsx`, `diamond-scene.ts`). It is drawn with plain WebGL2 rather than three.js, so it costs about 4 KB of gzipped script plus a 9 KB model, loaded once the page is idle. Each pixel traces light through the stone's facets, so it sparkles and shows fire as it turns. It draws only while on screen, lowers its resolution or holds still on slow GPUs, holds still for `prefers-reduced-motion`, and is skipped with Save-Data or without WebGL2. The hero is complete without it.
+- **Changed deliberately:** the hero background is a rendered still with a slow CSS "settle" rather than the existing site's three.js scene. Headings are set in the serif throughout, and ivory sections add rhythm. Images showing lab-grown reactors, "NavLab" branding or laboratory certificates were not reused.
 - **Accessibility:** skip link, landmarks, keyboard-operable menus and tabs, a native `<dialog>` for mobile filters, labelled form errors with focus management, AA colour contrast, and `prefers-reduced-motion` support (fades without movement). Content stays visible without JavaScript.
 - **Motion:** Framer Motion powers the scroll reveals and loads its animation features on demand after hydration. Other transitions are CSS.
