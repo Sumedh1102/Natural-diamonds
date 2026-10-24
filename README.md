@@ -41,7 +41,7 @@ npm run dev                  # http://localhost:3000
 | `/api/inquiry`                 | `POST` endpoint that validates inquiries and forwards them to your webhook                 |
 | `/sitemap.xml`, `/robots.txt`  | Generated from the routes and data                                                         |
 
-Catalogue URLs can be shared and linked, e.g. `/natural-diamonds?category=white&shape=oval,pear&carat=1-1.49&color=E,F&sort=carat-desc&view=list`. Other parameters: `origin=natural|treated`, `clarity=`, `cut=`, `q=` (search).
+Catalogue URLs can be shared and linked, e.g. `/natural-diamonds?category=white&shape=oval,pear&carat=1-&color=E,F&sort=carat-desc&view=list`. Other parameters: `origin=natural|treated`, `clarity=`, `cut=`, `q=` (search).
 
 ## Project structure
 

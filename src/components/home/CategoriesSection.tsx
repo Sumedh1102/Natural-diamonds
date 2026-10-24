@@ -4,6 +4,7 @@ import { StoneImage } from "@/components/products/StoneImage";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { siteConfig } from "@/config/site";
 import { categories } from "@/data/categories";
 import { getAllProducts, getFilterOptions } from "@/lib/catalogue";
 import { ShapeRail } from "./ShapeRail";
@@ -23,7 +24,7 @@ export function CategoriesSection() {
               Explore Natural <em>Diamond Categories</em>
             </span>
           }
-          description="From classic white diamonds to warm champagne tones and rare natural colour — every category is presented with its colour origin stated clearly."
+          description={`From classic white diamonds to warm champagne tones and rare natural colour — in sizes from ${siteConfig.sizeRange.text}, each with its colour origin stated clearly.`}
           className="mb-12 lg:mb-16"
         />
 

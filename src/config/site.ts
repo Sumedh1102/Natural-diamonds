@@ -24,6 +24,8 @@ export const siteConfig = {
   tagline: "Natural Diamonds",
   description:
     "Discover natural diamonds selected for life's most meaningful moments — loose diamonds, engagement stones and bespoke natural diamond jewellery, with personal guidance from the NAV team.",
+  /** Diamond sizes offered, as stated by the client. Shown in copy and the catalogue stats. */
+  sizeRange: { text: "0.003 ct to 1 ct and above", short: "0.003 – 1+" },
   url: siteUrl,
   locale: "en_IN",
   logo: {

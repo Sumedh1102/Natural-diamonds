@@ -8,6 +8,7 @@
 import { categories, getCategory, isDiamondCategory } from "@/data/categories";
 import { products } from "@/data/products";
 import { getShape, isDiamondShape, shapes } from "@/data/shapes";
+import { caratValue, formatCarat } from "@/lib/format";
 import type { ClarityGrade, ColorGrade, ColourOrigin, CutGrade, DiamondCategory, DiamondShape, Product } from "@/types";
 
 export const colorScale: ColorGrade[] = ["D", "E", "F", "G", "H", "I", "J", "K", "L", "M"];
@@ -16,12 +17,14 @@ export const cutScale: CutGrade[] = ["Excellent", "Very Good", "Good", "Fair"];
 
 export type CaratRange = { id: string; label: string; min: number; max: number };
 
+/** Size bands covering the range offered, 0.003 ct to 1 ct and above (siteConfig.sizeRange). */
 export const caratRanges: CaratRange[] = [
-  { id: "0-0.74", label: "Under 0.75 ct", min: 0, max: 0.745 },
+  { id: "0-0.09", label: "0.003 – 0.09 ct", min: 0, max: 0.095 },
+  { id: "0.1-0.29", label: "0.10 – 0.29 ct", min: 0.095, max: 0.295 },
+  { id: "0.3-0.49", label: "0.30 – 0.49 ct", min: 0.295, max: 0.495 },
+  { id: "0.5-0.74", label: "0.50 – 0.74 ct", min: 0.495, max: 0.745 },
   { id: "0.75-0.99", label: "0.75 – 0.99 ct", min: 0.745, max: 0.995 },
-  { id: "1-1.49", label: "1.00 – 1.49 ct", min: 0.995, max: 1.495 },
-  { id: "1.5-1.99", label: "1.50 – 1.99 ct", min: 1.495, max: 1.995 },
-  { id: "2-", label: "2.00 ct and above", min: 1.995, max: Number.POSITIVE_INFINITY },
+  { id: "1-", label: "1.00 ct and above", min: 0.995, max: Number.POSITIVE_INFINITY },
 ];
 
 export type SortKey = "featured" | "carat-desc" | "carat-asc" | "color" | "clarity" | "price-asc" | "price-desc";
@@ -119,7 +122,8 @@ export function getFilterOptions(items: Product[]) {
       .map((category) => ({ ...category, count: categoryCounts.get(category.id) ?? 0 })),
     origins: colourOrigins.filter((origin) => originSet.has(origin.value)),
     shapes: shapes.filter((shape) => shapeIds.has(shape.id)),
-    carats: caratRanges.filter((range) => items.some((p) => inRange(p.carat, range))),
+    // Every size band shows, listed or not, so the filter presents the full range offered.
+    carats: caratRanges,
     colors: colorScale.filter((grade) => colorSet.has(grade)),
     clarities: clarityScale.filter((grade) => claritySet.has(grade)),
     cuts: cutScale.filter((grade) => cutSet.has(grade)),
@@ -139,7 +143,7 @@ export function getRangeSummary(items: Product[]) {
   const shapeCount = new Set(items.map((p) => p.shape)).size;
   return {
     count: items.length,
-    carat: `${Math.min(...carats).toFixed(2)} – ${Math.max(...carats).toFixed(2)} ct`,
+    carat: `${caratValue(Math.min(...carats))} – ${caratValue(Math.max(...carats))} ct`,
     color: span(colors),
     clarity: span(clarities),
     shapes: shapeCount,
@@ -156,7 +160,7 @@ function searchText(product: Product) {
     product.reference,
     getCategory(product.category).label,
     getShape(product.shape).label,
-    `${product.carat.toFixed(2)} ct`,
+    formatCarat(product.carat),
     product.color ?? "",
     product.colorDescription ?? "",
     product.clarity ?? "",

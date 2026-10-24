@@ -1,7 +1,12 @@
 import type { Price, Product } from "@/types";
 
+/** Two decimals, or three below 0.01 ct so that melee such as 0.003 ct stays readable. */
+export function caratValue(carat: number) {
+  return carat.toFixed(carat < 0.01 ? 3 : 2);
+}
+
 export function formatCarat(carat: number) {
-  return `${carat.toFixed(2)} ct`;
+  return `${caratValue(carat)} ct`;
 }
 
 export function formatPrice(price: Price) {

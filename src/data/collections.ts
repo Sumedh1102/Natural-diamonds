@@ -1,3 +1,4 @@
+import { siteConfig } from "@/config/site";
 import type { Collection } from "@/types";
 
 /**
@@ -13,7 +14,7 @@ export const collections: Collection[] = [
     summary: "Cut and polished natural diamonds, ready to be chosen on their own merits and set to your design.",
     description: [
       "Loose diamonds have been cut and polished but not yet set. Choosing one on its own lets you weigh shape, size and quality exactly as you wish before deciding how it will be worn.",
-      "Every diamond in this collection is a natural diamond. Each listing shows its shape, carat weight, colour and clarity, with further specifications available on request.",
+      `Every diamond in this collection is a natural diamond, in sizes from ${siteConfig.sizeRange.text}. Each listing shows its shape, carat weight, colour and clarity, with further specifications available on request.`,
     ],
     image: {
       src: "/images/collections/diamonds-on-charcoal.webp",
@@ -42,7 +43,7 @@ export const collections: Collection[] = [
       alt: "A cushion-cut diamond held in tweezers beneath a microscope",
     },
     kind: "catalogue",
-    catalogueQuery: "?category=white&carat=1-1.49,1.5-1.99,2-",
+    catalogueQuery: "?category=white&carat=1-",
     inquiryInterest: "Engagement diamond",
     highlights: [
       { title: "One carat and above", text: "Centre stones sized for solitaire and halo settings." },

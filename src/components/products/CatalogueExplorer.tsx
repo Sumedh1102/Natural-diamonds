@@ -40,7 +40,7 @@ const SEARCH_DEBOUNCE_MS = 250;
 
 /**
  * Search, filter and sort the catalogue. State lives in the URL
- * (e.g. /natural-diamonds?shape=oval&carat=1-1.49) so results can be shared
+ * (e.g. /natural-diamonds?shape=oval&carat=1-) so results can be shared
  * and collection links can open pre-filtered views.
  */
 export function CatalogueExplorer({ products, options }: CatalogueExplorerProps) {

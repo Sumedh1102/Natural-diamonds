@@ -28,13 +28,16 @@ const sections = [
 ];
 
 /** Approximate face-up diameters for well-proportioned round brilliants. */
+// Round brilliant diameters across the size range offered; the last step covers 1 ct and above.
 const caratSizes = [
+  { carat: "0.003", mm: "0.9" },
+  { carat: "0.01", mm: "1.3" },
+  { carat: "0.05", mm: "2.4" },
+  { carat: "0.10", mm: "3.0" },
   { carat: "0.25", mm: "4.1" },
   { carat: "0.50", mm: "5.2" },
   { carat: "0.75", mm: "5.8" },
-  { carat: "1.00", mm: "6.5" },
-  { carat: "1.50", mm: "7.4" },
-  { carat: "2.00", mm: "8.2" },
+  { carat: "1+", mm: "6.5" },
 ];
 
 const reportIcons = [Microscope, Hash, Scale];
@@ -160,7 +163,7 @@ export default function DiamondEducationPage() {
                     {c.id === "carat" && (
                       <div>
                         <p className="mb-4 text-xs text-taupe">Approximate diameter of a well-proportioned round brilliant</p>
-                        <ul className="flex items-end justify-between gap-2">
+                        <ul className="grid grid-cols-4 items-end gap-x-2 gap-y-5 sm:flex sm:justify-between">
                           {caratSizes.map((size) => (
                             <li key={size.carat} className="flex flex-col items-center gap-2">
                               <span
@@ -169,7 +172,10 @@ export default function DiamondEducationPage() {
                                 style={{ width: `${Number(size.mm) * 4}px`, height: `${Number(size.mm) * 4}px` }}
                               />
                               <span className="text-xs font-medium text-ink">{size.carat} ct</span>
-                              <span className="text-[10px] text-taupe">≈{size.mm} mm</span>
+                              <span className="text-[10px] text-taupe">
+                                {size.carat.endsWith("+") ? "≥" : "≈"}
+                                {size.mm} mm
+                              </span>
                             </li>
                           ))}
                         </ul>

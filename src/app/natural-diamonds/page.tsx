@@ -5,6 +5,7 @@ import { SampleNotice } from "@/components/products/SampleNotice";
 import { Container } from "@/components/ui/Container";
 import { PageHero } from "@/components/ui/PageHero";
 import { ConsultationCta } from "@/components/home/ConsultationCta";
+import { siteConfig } from "@/config/site";
 import { getAllProducts, getFilterOptions, getRangeSummary } from "@/lib/catalogue";
 import { pageMetadata } from "@/lib/metadata";
 import type { Product } from "@/types";
@@ -12,7 +13,7 @@ import type { Product } from "@/types";
 export const metadata = pageMetadata({
   title: "Natural Diamonds",
   description:
-    "Browse natural diamonds by shape, carat weight, colour and clarity. Search the collection, compare specifications and enquire about any diamond.",
+    `Browse natural diamonds from ${siteConfig.sizeRange.text} by shape, carat weight, colour and clarity. Search the collection, compare specifications and enquire about any diamond.`,
   path: "/natural-diamonds",
 });
 
@@ -46,7 +47,7 @@ export default function NaturalDiamondsPage() {
         { value: String(summary.count), label: "Diamonds listed" },
         { value: String(options.categories.length), label: options.categories.length === 1 ? "Category" : "Categories" },
         { value: String(summary.shapes), label: summary.shapes === 1 ? "Shape" : "Shapes" },
-        { value: summary.carat.replace(" ct", ""), label: "Carat range" },
+        { value: siteConfig.sizeRange.short, label: "Carat range" },
       ]
     : [];
 
@@ -59,7 +60,7 @@ export default function NaturalDiamondsPage() {
             Natural <em>Diamonds</em>
           </>
         }
-        description="Each diamond here was formed by nature. Browse by category, refine by shape, carat weight, colour and clarity, and compare listings side by side before you enquire."
+        description={`Each diamond here was formed by nature, in sizes from ${siteConfig.sizeRange.text}. Browse by category, refine by shape, carat weight, colour and clarity, and compare listings side by side before you enquire.`}
         breadcrumbs={[{ label: "Natural Diamonds" }]}
         image={{
           src: "/images/collections/fancy-shapes-blue.webp",
