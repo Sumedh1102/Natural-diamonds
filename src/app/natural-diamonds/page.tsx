@@ -62,8 +62,8 @@ export default function NaturalDiamondsPage() {
         description="Each diamond here was formed by nature. Browse by category, refine by shape, carat weight, colour and clarity, and compare listings side by side before you enquire."
         breadcrumbs={[{ label: "Natural Diamonds" }]}
         image={{
-          src: "/images/collections/loose-diamonds-velvet.webp",
-          alt: "Loose natural diamonds in different shapes on black velvet",
+          src: "/images/collections/fancy-shapes-blue.webp",
+          alt: "Loose diamonds in different shapes on a deep blue surface",
         }}
       >
         {stats.length > 0 && (

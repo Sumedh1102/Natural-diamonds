@@ -50,7 +50,7 @@ public/images/        Client-owned imagery, optimised from the existing site
   brand/              NAV mark, Open Graph image
   hero/               mine-desktop / mine-mobile: rendered open-pit mine (see tools/mine-render)
 public/models/        diamond.glb: the hero's turning diamond (made by tools/diamond-model)
-  editorial/          Story imagery: craftsmen at work, kimberlite cutaways (illustrations), rock
+  editorial/          Story imagery: mine, rough, craftsmen, inspection, kimberlite cutaways (illustrations)
   colours/            Representative coloured diamonds (champagne, yellow, pink, black)
   collections/        Collection imagery
   shapes/             Cut-out photographs of each diamond shape
@@ -168,7 +168,7 @@ The homepage hero (`public/images/hero/mine-desktop.webp` 2560×1440, `mine-mobi
 - Remove the "Illustration · open-pit kimberlite mine" captions in `src/components/home/Hero.tsx` if the new image is a photograph, and update the `alt` text there.
 - Hero video: the hero background is image-only for performance. If you add a video, keep the current image as its `poster`, load it only on landscape screens, and skip autoplay when `prefers-reduced-motion` or Save-Data is set.
 
-The turning diamond over the mine is a third-party 3D model, **"Diamond" by Karolina Renkiewicz, CC BY 4.0**. Its licence requires the credit shown in the hero, so keep it (or replace the model, see `tools/diamond-model/README.md`).
+The turning diamond over the mine is a third-party 3D model, **"Diamond" by Karolina Renkiewicz, CC BY 4.0**. Its licence requires the credit shown in the site footer, so keep it (or replace the model, see `tools/diamond-model/README.md`).
 
 ### 6. Legal pages
 

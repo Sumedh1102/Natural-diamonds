@@ -74,7 +74,7 @@ export default function DiamondEducationPage() {
         }
         description="Everything you need to choose with confidence — explained clearly, without jargon. Remember that every natural diamond is unique: these guides describe how diamonds are assessed, not the qualities of any single stone."
         breadcrumbs={[{ label: "Diamond Education" }]}
-        image={{ src: "/images/collections/shapes-chart.webp", alt: "A chart of polished diamonds in many different shapes" }}
+        image={{ src: "/images/editorial/grading-microscope.webp", alt: "A round brilliant diamond under an inspection microscope" }}
       >
         <nav aria-label="On this page">
           <ul className="flex flex-wrap gap-2">
@@ -289,8 +289,8 @@ export default function DiamondEducationPage() {
             <Reveal className="lg:col-span-6">
               <div className="relative aspect-[2/1] overflow-hidden rounded-2xl border border-white/10">
                 <Image
-                  src="/images/editorial/rough-crystals.webp"
-                  alt="Three rough natural diamond crystals"
+                  src="/images/editorial/kimberlite-pipes-sunset.webp"
+                  alt="An open-pit mine at sunset above a cutaway of kimberlite pipes rising from deep in the Earth (illustration)"
                   fill
                   sizes="(min-width: 1024px) 45vw, 100vw"
                   className="object-cover"

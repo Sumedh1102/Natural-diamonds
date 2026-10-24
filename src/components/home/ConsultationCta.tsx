@@ -24,11 +24,11 @@ export function ConsultationCta({
   return (
     <section aria-labelledby="consultation-title" className="relative isolate overflow-hidden bg-black">
       <Image
-        src="/images/collections/loose-diamonds-velvet.webp"
+        src="/images/collections/diamonds-on-charcoal.webp"
         alt=""
         fill
         sizes="100vw"
-        className="-z-20 object-cover opacity-45"
+        className="-z-20 object-cover object-top opacity-45"
       />
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.55)_0%,rgba(0,0,0,0.9)_75%)]" />
       <div className="mx-auto max-w-4xl px-4 py-24 text-center sm:px-6 sm:py-32 lg:py-40">

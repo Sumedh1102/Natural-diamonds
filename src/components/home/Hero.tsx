@@ -30,33 +30,6 @@ function heroSources() {
   return { landscape, portrait, img };
 }
 
-/*
- * The turning diamond is "Diamond" by Karolina Renkiewicz, adapted (reshaded in
- * WebGL, see tools/diamond-model). Its CC BY 4.0 licence requires this credit
- * wherever it is shown.
- */
-const creditLinkClass = "underline decoration-white/25 underline-offset-2 transition-colors hover:text-white";
-
-function DiamondCredit() {
-  return (
-    <>
-      3D diamond adapted from{" "}
-      <a
-        href="https://sketchfab.com/3d-models/diamond-1ab1e8de5a604b4081c15326eaa5682b"
-        target="_blank"
-        rel="noopener noreferrer"
-        className={creditLinkClass}
-      >
-        &ldquo;Diamond&rdquo;
-      </a>{" "}
-      by Karolina Renkiewicz ·{" "}
-      <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" className={creditLinkClass}>
-        CC BY 4.0
-      </a>
-    </>
-  );
-}
-
 const captionClass = "text-[10px] uppercase leading-relaxed tracking-[0.22em] text-white/55";
 
 export function Hero() {
@@ -114,11 +87,8 @@ export function Hero() {
 
         {/* Between the copy and the buttons on portrait; above the pit, clear of the copy, on landscape. */}
         <div className="my-4 flex min-h-52 flex-1 flex-col wide:absolute wide:inset-y-0 wide:left-[max(52%,36rem)] wide:right-[2%] wide:my-0 wide:items-center wide:justify-center wide:pb-8 2xl:wide:right-[5%]">
+          {/* The model's CC BY 4.0 credit is in the footer (Footer.tsx). */}
           <HeroDiamond className="min-h-0 flex-1 motion-safe:animate-float wide:aspect-square wide:h-[min(27rem,46vh)] wide:flex-none" />
-          {/* Pulled up into the empty corner of the canvas below the stone. */}
-          <p className={cn(captionClass, "mx-auto hidden max-w-md text-balance text-center wide:-mt-[min(5rem,8.5vh)] wide:block")}>
-            <DiamondCredit />
-          </p>
         </div>
 
         <div className="mt-6 motion-safe:animate-[rise_0.9s_var(--ease-luxe)_0.3s_both] wide:mt-10">
@@ -130,11 +100,7 @@ export function Hero() {
               Discover Their Origin
             </ButtonLink>
           </div>
-          <p className={cn(captionClass, "mt-5 wide:hidden")}>
-            Illustration · open-pit kimberlite mine
-            <br />
-            <DiamondCredit />
-          </p>
+          <p className={cn(captionClass, "mt-5 wide:hidden")}>Illustration · open-pit kimberlite mine</p>
         </div>
       </div>
 

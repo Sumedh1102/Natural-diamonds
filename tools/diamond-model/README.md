@@ -3,8 +3,8 @@
 The turning diamond in the homepage hero is **"Diamond" by Karolina Renkiewicz**
 (<https://sketchfab.com/3d-models/diamond-1ab1e8de5a604b4081c15326eaa5682b>), licensed under
 **[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)**. The licence allows commercial use on condition
-that the author is credited and changes are indicated, so the hero shows the credit
-("3D diamond adapted from “Diamond” by Karolina Renkiewicz · CC BY 4.0", in `src/components/home/Hero.tsx`).
+that the author is credited and changes are indicated, so the site footer shows the credit
+("Homepage 3D diamond adapted from “Diamond” by Karolina Renkiewicz · CC BY 4.0", in `src/components/layout/Footer.tsx`).
 Keep it wherever the model is shown.
 
 - `diamond-source.glb`: the model as downloaded (2.1 MB, mostly 4K textures).
@@ -32,4 +32,4 @@ No dependencies are needed.
 
 Replace `diamond-source.glb` and run the optimiser. The shader assumes the stone is **convex** (as cut diamonds
 are), stands with its table facing +Y, and has at most about 200 hull planes (it reports the count). Update the
-credit in `Hero.tsx` to the new model's licence.
+credit in `Footer.tsx` to the new model's licence.

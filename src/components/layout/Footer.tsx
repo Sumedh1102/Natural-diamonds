@@ -13,6 +13,33 @@ function FooterHeading({ children }: { children: ReactNode }) {
 
 const linkClass = "text-sm text-white/55 transition-colors duration-200 hover:text-white";
 
+const creditLinkClass = "underline decoration-white/25 underline-offset-2 transition-colors hover:text-white";
+
+/*
+ * The homepage hero's turning diamond is "Diamond" by Karolina Renkiewicz,
+ * adapted (reshaded in WebGL, see tools/diamond-model). Its CC BY 4.0 licence
+ * requires this credit while the model is shown.
+ */
+function DiamondCredit() {
+  return (
+    <p className="mt-4 text-[11px] leading-relaxed text-white/55">
+      Homepage 3D diamond adapted from{" "}
+      <a
+        href="https://sketchfab.com/3d-models/diamond-1ab1e8de5a604b4081c15326eaa5682b"
+        target="_blank"
+        rel="noopener noreferrer"
+        className={creditLinkClass}
+      >
+        &ldquo;Diamond&rdquo;
+      </a>{" "}
+      by Karolina Renkiewicz ·{" "}
+      <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" className={creditLinkClass}>
+        CC BY 4.0
+      </a>
+    </p>
+  );
+}
+
 export function Footer() {
   const { contact, social } = siteConfig;
 
@@ -136,6 +163,7 @@ export function Footer() {
           </p>
           <p className="uppercase tracking-[0.25em]">Natural diamonds only</p>
         </div>
+        <DiamondCredit />
       </div>
     </footer>
   );

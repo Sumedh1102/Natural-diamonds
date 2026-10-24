@@ -67,8 +67,8 @@ export default function AboutPage() {
         description={`${siteConfig.name} is a space created by ${siteConfig.company} in Mumbai for those drawn to the character of a diamond formed by nature — presented clearly, chosen with guidance and set with care.`}
         breadcrumbs={[{ label: "Our Story" }]}
         image={{
-          src: "/images/editorial/rough-and-polished.webp",
-          alt: "Rough natural diamond crystals beside a polished diamond",
+          src: "/images/editorial/rough-sunlit.webp",
+          alt: "Rough diamond crystals of different colours in soft sunlight",
         }}
       />
 

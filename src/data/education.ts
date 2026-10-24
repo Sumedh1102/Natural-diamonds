@@ -115,15 +115,15 @@ export const originSteps: {
     meta: "Open-pit, underground and alluvial",
     text: "Diamonds are recovered from these pipes in open-pit and underground mines, or from alluvial deposits where rivers and erosion carried them over time.",
     image: {
-      src: "/images/editorial/kimberlite-pipes-sunset.webp",
-      alt: "An open-pit mine at sunset above a cutaway of kimberlite pipes rising from deep in the Earth (illustration)",
+      src: "/images/editorial/open-pit-mine.webp",
+      alt: "A terraced open-pit mine at golden hour (illustration)",
     },
   },
   {
     title: "The Rough Revealed",
     meta: "Sorting the rough",
     text: "Recovered rough is sorted by size, shape, colour and quality — the first step on its journey to becoming a polished natural diamond.",
-    image: { src: "/images/editorial/rough-crystals.webp", alt: "Three rough natural diamond crystals" },
+    image: { src: "/images/editorial/rough-on-rock.webp", alt: "Rough crystals resting on dark, crushed rock" },
   },
 ];
 
@@ -133,7 +133,10 @@ export const craftSteps = [
     title: "Planning",
     quote: "The rough diamond is examined carefully to decide how it should be cut.",
     text: "Experts study the stone's size, shape, natural inclusions and internal structure, planning a cut that brings out brilliance and symmetry while preserving as much of the crystal as possible.",
-    image: { src: "/images/editorial/rough-and-polished.webp", alt: "Rough diamond crystals beside a polished Asscher-cut diamond" },
+    image: {
+      src: "/images/editorial/rough-inspection.webp",
+      alt: "A specialist in white gloves examining a rough diamond under a microscope, with trays of rough stones on the bench",
+    },
   },
   {
     title: "Cleaving & Sawing",
@@ -154,7 +157,7 @@ export const craftSteps = [
     title: "Grading",
     quote: "Finally, the diamond is assessed against the 4Cs.",
     text: "Cut, colour, clarity and carat weight are evaluated to describe the diamond's quality. Independent laboratories can also issue a grading report.",
-    image: { src: "/images/collections/shapes-chart.webp", alt: "Polished diamonds of many shapes laid out in rows for grading" },
+    image: { src: "/images/editorial/grading-microscope.webp", alt: "A round brilliant diamond on the glass stage of an inspection microscope" },
   },
 ];
 
