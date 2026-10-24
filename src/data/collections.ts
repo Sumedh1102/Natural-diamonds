@@ -122,7 +122,7 @@ export const collections: Collection[] = [
       {
         title: "Setting & Polishing",
         text: "Once the precious metal piece is cast and finished, the diamonds are set with precision under magnification, and the piece is polished.",
-        image: { src: "/images/editorial/cutting-wheel.webp", alt: "A craftsman's hands at a polishing wheel" },
+        image: { src: "/images/editorial/cutter-microscope.webp", alt: "A craftsman working under magnification at a polishing machine" },
       },
       {
         title: "Presentation",

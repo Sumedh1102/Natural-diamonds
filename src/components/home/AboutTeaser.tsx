@@ -11,8 +11,8 @@ export function AboutTeaser() {
       <div className="grid lg:grid-cols-2">
         <Reveal className="relative min-h-[22rem] lg:min-h-[38rem]">
           <Image
-            src="/images/editorial/design-sketch.webp"
-            alt="A designer sketching a diamond ring at her desk"
+            src="/images/editorial/kimberlite-pipe.webp"
+            alt="A cutaway of the Earth beneath an open-pit mine, with a rough diamond carried up a kimberlite pipe (illustration)"
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover"

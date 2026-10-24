@@ -114,7 +114,10 @@ export const originSteps: {
     title: "Recovered from the Earth",
     meta: "Open-pit, underground and alluvial",
     text: "Diamonds are recovered from these pipes in open-pit and underground mines, or from alluvial deposits where rivers and erosion carried them over time.",
-    image: { src: "/images/editorial/mine-aerial.webp", alt: "Aerial view of a terraced open-pit mine with a spiral haul road (illustration)" },
+    image: {
+      src: "/images/editorial/kimberlite-pipes-sunset.webp",
+      alt: "An open-pit mine at sunset above a cutaway of kimberlite pipes rising from deep in the Earth (illustration)",
+    },
   },
   {
     title: "The Rough Revealed",
@@ -136,13 +139,16 @@ export const craftSteps = [
     title: "Cleaving & Sawing",
     quote: "Once the plan is final, the rough is divided into workable pieces.",
     text: "The diamond is split along its natural planes or sawn with diamond-tipped blades or lasers, removing unwanted areas and preparing it for shaping.",
-    image: { src: "/images/editorial/bruting.webp", alt: "A diamond being shaped on a precision machine" },
+    image: {
+      src: "/images/editorial/cutter-microscope.webp",
+      alt: "A craftsman working under a microscope at a cutting machine, with rough diamonds on the bench",
+    },
   },
   {
     title: "Cutting & Polishing",
     quote: "The diamond begins to take its final shape.",
     text: "Skilled cutters form the outline — round, oval, pear, emerald and more — and polish each facet with fine diamond powder to reveal its brilliance.",
-    image: { src: "/images/editorial/cutting-wheel.webp", alt: "A craftsman polishing a diamond on a spinning wheel" },
+    image: { src: "/images/editorial/cutter-loupe.webp", alt: "A diamond cutter wearing a loupe, polishing a stone on a spinning wheel" },
   },
   {
     title: "Grading",

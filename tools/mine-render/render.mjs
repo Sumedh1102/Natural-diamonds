@@ -15,7 +15,6 @@ const light = "&sx=0.55&sy=0.14&sz=0.82";
 const shots = [
   { name: "mine-desktop", w: 3840, h: 2160, q: `&seg=2000&fov=41&pos=-760,330,980&look=-50,80,-460${light}` },
   { name: "mine-mobile", w: 1620, h: 2880, q: `&seg=2000&fov=69&pos=-220,470,1000&look=-40,-45,-280${light}` },
-  { name: "mine-aerial", w: 2400, h: 1800, q: `&seg=2000&fov=36&pos=-180,1750,620&look=0,-200,-20&sx=0.55&sy=0.22&sz=0.8` },
 ];
 
 mkdirSync("out", { recursive: true });

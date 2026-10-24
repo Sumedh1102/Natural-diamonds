@@ -50,7 +50,7 @@ public/images/        Client-owned imagery, optimised from the existing site
   brand/              NAV mark, Open Graph image
   hero/               mine-desktop / mine-mobile: rendered open-pit mine (see tools/mine-render)
 public/models/        diamond.glb: the hero's turning diamond (made by tools/diamond-model)
-  editorial/          Story photography, plus mine-aerial (rendered)
+  editorial/          Story imagery: craftsmen at work, kimberlite cutaways (illustrations), rock
   colours/            Representative coloured diamonds (champagne, yellow, pink, black)
   collections/        Collection imagery
   shapes/             Cut-out photographs of each diamond shape
@@ -162,7 +162,7 @@ Set `NEXT_PUBLIC_SITE_URL` to the production domain (e.g. `https://www.example.c
 
 ### 5. Replace the hero render with licensed imagery (recommended)
 
-The homepage hero (`public/images/hero/mine-desktop.webp` 2560×1440, `mine-mobile.webp` 1080×1920) and the aerial view in the origin story (`public/images/editorial/mine-aerial.webp`) are **computer-generated renders of a generic open-pit kimberlite mine**, made with `tools/mine-render` because no licensed mine photography could be obtained. They depict no specific mine, and the hero carries a small "Illustration" caption. To use licensed photography or footage instead:
+The homepage hero (`public/images/hero/mine-desktop.webp` 2560×1440, `mine-mobile.webp` 1080×1920) is a **computer-generated render of a generic open-pit kimberlite mine**, made with `tools/mine-render` because no licensed mine photography could be obtained. It depicts no specific mine, and the hero carries a small "Illustration" caption. To use licensed photography or footage instead:
 
 - Overwrite the files with the same names and similar compositions: in the landscape frame the pit sits right of centre with darker ground on the left for the text; in the portrait frame a dark sky sits at the top and the pit is centred.
 - Remove the "Illustration · open-pit kimberlite mine" captions in `src/components/home/Hero.tsx` if the new image is a photograph, and update the `alt` text there.

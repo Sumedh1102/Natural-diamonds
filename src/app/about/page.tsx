@@ -77,11 +77,11 @@ export default function AboutPage() {
           <Reveal className="lg:col-span-5">
             <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/10">
               <Image
-                src="/images/editorial/cutting-wheel.webp"
-                alt="A craftsman's hands polishing a diamond at a spinning wheel"
+                src="/images/editorial/kimberlite-rock.webp"
+                alt="Crystals embedded in layered dark rock"
                 fill
                 sizes="(min-width: 1024px) 40vw, 100vw"
-                className="object-cover"
+                className="object-cover object-[20%_50%]"
               />
             </div>
           </Reveal>

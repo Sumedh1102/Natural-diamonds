@@ -1,9 +1,9 @@
 # Mine hero renderer
 
-The homepage hero (`public/images/hero/mine-desktop.webp`, `mine-mobile.webp`) and the aerial view
-(`public/images/editorial/mine-aerial.webp`) are **computer-generated renders** of a generic open-pit
-kimberlite mine, not photographs of a real mine. They were made because no licensed mine photography
-was available. They depict no specific mine and make no claim about where any diamond comes from.
+The homepage hero (`public/images/hero/mine-desktop.webp`, `mine-mobile.webp`) is a **computer-generated
+render** of a generic open-pit kimberlite mine, not a photograph of a real mine. It was made because no
+licensed mine photography was available. It depicts no specific mine and makes no claim about where any
+diamond comes from.
 
 To replace them with licensed photography or video, overwrite the files above (keep the names and
 roughly the same composition: pit to the right on desktop, pit centred with dark sky on mobile), or
