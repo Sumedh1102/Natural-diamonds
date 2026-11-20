@@ -4,10 +4,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { partners } from "@/config/partners";
 
-/**
- * Organisation logos. Official artwork is supplied through `config/partners.ts`;
- * until then each slot shows a labelled placeholder, never a recreated logo.
- */
+/** Organisation logos, supplied through `config/partners.ts`, shown in their original proportions and colours. */
 export function AssociatedWith() {
   return (
     <section id="associated-with" aria-labelledby="associated-title" className="bg-ivory py-20 text-ink sm:py-24 lg:py-28">
@@ -29,7 +26,8 @@ export function AssociatedWith() {
                     alt={`${partner.name} logo`}
                     width={partner.logo.width}
                     height={partner.logo.height}
-                    className="h-auto max-h-28 w-auto max-w-full object-contain"
+                    unoptimized={partner.logo.src.endsWith(".svg")}
+                    className="h-auto max-h-28 w-auto max-w-full object-contain transition-[filter] duration-500 group-hover:drop-shadow-[0_10px_18px_rgba(43,36,32,0.18)]"
                   />
                 ) : (
                   <div
