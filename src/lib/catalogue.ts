@@ -80,9 +80,19 @@ export function getProduct(slug: string): Product | undefined {
   return products.find((product) => product.slug === slug);
 }
 
+/** Genuine inventory flagged as featured. Illustrative samples are never featured. */
 export function getFeaturedProducts(limit = 4): Product[] {
-  const featured = products.filter((product) => product.featured);
-  return (featured.length ? featured : products).slice(0, limit);
+  return products.filter((product) => product.featured && !product.isSample).slice(0, limit);
+}
+
+/** Illustrative starter listings, shown only in the Sample Listings section. */
+export function getSampleProducts(limit = 4): Product[] {
+  return products.filter((product) => product.isSample).slice(0, limit);
+}
+
+/** Genuine listings whose grading report has been checked against the laboratory's records. */
+export function getCertifiedProducts(): Product[] {
+  return products.filter((product) => !product.isSample && product.gradingReport?.verified);
 }
 
 export function getProductsInCollection(slug: string): Product[] {

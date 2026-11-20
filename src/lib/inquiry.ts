@@ -1,4 +1,4 @@
-import { budgetRanges, inquiryInterests, type InquiryData, type InquiryErrors } from "@/types";
+import { budgetRanges, inquiryInterests, type InquiryData, type InquiryErrors, type InquiryInterest } from "@/types";
 
 export const emptyInquiry: InquiryData = {
   name: "",
@@ -78,4 +78,9 @@ export function inquirySummary(data: InquiryData) {
     .filter(([, value]) => value.trim())
     .map(([label, value]) => `${label}: ${value.trim()}`);
   return [...lines, "", data.message.trim()].join("\n");
+}
+
+/** Link to the contact page with the inquiry form's interest preselected. */
+export function contactHref(interest: InquiryInterest): string {
+  return `/contact?interest=${encodeURIComponent(interest)}`;
 }

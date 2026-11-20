@@ -151,9 +151,12 @@ export type ShapeInfo = {
 
 export const inquiryInterests = [
   "Loose natural diamond",
+  "Certified diamond",
+  "Calibrated parcel",
   "Engagement diamond",
   "Matched pair or layout",
   "Bespoke jewellery",
+  "B2B requirement",
   "A specific listed diamond",
   "General guidance",
 ] as const;
