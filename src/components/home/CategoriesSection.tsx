@@ -6,13 +6,11 @@ import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { siteConfig } from "@/config/site";
 import { categories } from "@/data/categories";
-import { getAllProducts, getFilterOptions } from "@/lib/catalogue";
-import { ShapeRail } from "./ShapeRail";
+import { getAllProducts } from "@/lib/catalogue";
 
 /** Category overview in the spirit of a diamond house's product range, driven by the catalogue data. */
 export function CategoriesSection() {
   const products = getAllProducts();
-  const { shapes } = getFilterOptions(products);
 
   return (
     <section id="categories" aria-labelledby="categories-title" className="py-20 sm:py-24 lg:py-32">
@@ -65,13 +63,6 @@ export function CategoriesSection() {
             );
           })}
         </ul>
-
-        <div className="mt-20 border-t border-white/10 pt-14">
-          <h3 className="font-serif text-2xl font-light text-white sm:text-3xl">
-            Or browse by <em className="italic text-bronze-200">shape</em>
-          </h3>
-          <ShapeRail shapes={shapes} />
-        </div>
       </Container>
     </section>
   );
